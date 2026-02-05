@@ -1,31 +1,36 @@
 Requirements – Starter Template
-Project Name: Your App Name
-Team: Names and roles
+Project Name: Scene Scout
+Team: Bridger Hansen - Audience Side, Yash Patel - Band Side
 Course: CSC 340
 Version: 1.0
-Date: 2026-01-30
+Date: 2026-02-03
 
 1. Overview
-Vision. One or two sentences: who this is for, the core problem, and the outcome.
+An app for local basement/garage bands to promote their show and for audiences to find local cheap shows.
 
 Glossary Terms used in the project
 
-Term 1: description.
-Term 2: description
+Term 1: Audience - User
+Term 2: Band - Seller/Uploader
+Term 3: Show - Event being uploaded
+
 Primary Users / Roles.
 
-Customer (e.g., Student/Patient/Pet Owner/etc. ) — 1 line goal statement.
-Provider (e.g., Teacher/Doctor/Pet Sitter/etc. ) — 1 line goal statement.
-SysAdmin (optional) — 1 line goal statement.
+Audience  — Find local small shows
+Bands - Promote local cheap shows
+
 Scope (this semester).
+Bands can post shows
+Account management and creation
+UI Accessibility
+Genre segregation
 
-<capability 1>
-<capability 2>
-<capability 3>
 Out of scope (deferred).
+Selling Tickets
+AI Chatbot
+Map Integration
+Venue Layout
 
-<deferred 1>
-<deferred 2>
 This document is requirements‑level and solution‑neutral; design decisions (UI layouts, API endpoints, schemas) are documented separately.
 
 2. Functional Requirements (User Stories)
@@ -33,21 +38,42 @@ Write each story as: As a <role>, I want <capability>, so that <benefit>. Each s
 
 2.1 Customer Stories
 US‑CUST‑001 —
-Story: As a customer, I want … so that …
+Story: As an audience member, I want to login and check my local feed.
 Acceptance:
 
-Scenario: <happy path>
-  Given <preconditions>
-  When  <action>
-  Then  <observable outcome>
+Scenario:
+  Given the audience member has an account already
+  When  the audience member opens the app
+  Then  a list of nearby shows are displayed
 US‑CUST‑002 —
-Story: As a customer, I want … so that …
+Story: As an audience member, I want to redirect to apple/google maps to get to the show destination.
 Acceptance:
 
-Scenario: <happy path>
-  Given <preconditions>
-  When  <action>
-  Then  <observable outcome>
+Scenario: 
+  Given the audience member is logged in.
+  When  the audience member clicks on destination in the show details 
+  Then  redirect to a preferred navigation app
+
+US-CUST-003-
+Story: As an audience member , I want to see details for a show including ticket medium, location, price, genre, band lineup.
+
+Scenario:
+	Given the audience member is on their feed and logged in.
+	When the audience member clicks on a show
+	Then they see all of the details of the show
+
+US-CUST-004-
+Story: As an audience member, I want to see posters/images for the show
+  Given the audience member is on their feed and logged in
+  When the audience member scrolls through their feed
+  Then they see all of the shows with marketing images/posters.
+
+US-CUST-005-
+Story: As an audience member, I want to search for local shows
+  Given the audience member is logged in and on their feed and has a band or genre in mind.
+  When the audience member clicks on the search bar
+  Then the search filters all local bands within the search details
+
 2.2 Provider Stories
 US‑PROV‑001 —
 Story: As a provider, I want … so that …
