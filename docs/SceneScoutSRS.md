@@ -1,127 +1,172 @@
-Requirements – Starter Template
-Project Name: Scene Scout
-Team: Bridger Hansen - Audience Side, Yash Patel - Band Side
-Course: CSC 340
-Version: 1.0
-Date: 2026-02-03
+# Requirements - Scene Scout
 
-1. Overview
-An app for local basement/garage bands to promote their show and for audiences to find local cheap shows.
+**Project Name:** Scene Scout \
+**Team:** Bridger Hansen - Audience Side, Yash Patel - Band Side \
+**Course:** CSC 340 \
+**Version:** 1.0 \
+**Date:** 2026-02-03
 
-Glossary Terms used in the project
+---
 
-Term 1: Audience - User
-Term 2: Band - Seller/Uploader
-Term 3: Show - Event being uploaded
+## 1. Overview
 
-Primary Users / Roles.
+**Vision.** An app for local basement/garage bands to promote their show and for audiences to find local cheap shows.
 
-Audience  — Find local small shows
-Bands - Promote local cheap shows
+**Glossary** Terms used in the project
 
-Scope (this semester).
-Bands can post shows
-Account management and creation
-UI Accessibility
-Genre segregation
+- **Term 1:** Audience - User
+- **Term 2:** Band - Seller/Uploader
+- **Term 3:** Show - Event being uploaded
 
-Out of scope (deferred).
-Selling Tickets
-AI Chatbot
-Map Integration
-Venue Layout
+**Primary Users / Roles.**
 
-This document is requirements‑level and solution‑neutral; design decisions (UI layouts, API endpoints, schemas) are documented separately.
+- **Audience** — Find local small shows
+- **Bands** — Promote local cheap shows
 
-2. Functional Requirements (User Stories)
-Write each story as: As a <role>, I want <capability>, so that <benefit>. Each story includes at least one Given/When/Then scenario.
+**Scope (this semester).**
 
-2.1 Customer Stories
-US‑CUST‑001 —
-Story: As an audience member, I want to login and check my local feed.
-Acceptance:
+- Bands can post shows
+- Account management and creation
+- UI Accessibility
+- Genre segregation
 
-Scenario:
-  Given the audience member has an account already
-  When  the audience member opens the app
-  Then  a list of nearby shows are displayed
-US‑CUST‑002 —
-Story: As an audience member, I want to redirect to apple/google maps to get to the show destination.
-Acceptance:
+**Out of scope (deferred).**
 
-Scenario: 
-  Given the audience member is logged in.
-  When  the audience member clicks on destination in the show details 
-  Then  redirect to a preferred navigation app
+- Selling Tickets
+- AI Chatbot
+- Map Integration
+- Venue Layout
 
-US-CUST-003-
-Story: As an audience member , I want to see details for a show including ticket medium, location, price, genre, band lineup.
+> This document is **requirements‑level** and solution‑neutral; design decisions (UI layouts, API endpoints, schemas) are documented separately.
 
-Scenario:
-	Given the audience member is on their feed and logged in.
-	When the audience member clicks on a show
-	Then they see all of the details of the show
+---
 
-US-CUST-004-
-Story: As an audience member, I want to see posters/images for the show
-  Given the audience member is on their feed and logged in
-  When the audience member scrolls through their feed
-  Then they see all of the shows with marketing images/posters.
+## 2. Functional Requirements (User Stories)
 
-US-CUST-005-
-Story: As an audience member, I want to search for local shows
-  Given the audience member is logged in and on their feed and has a band or genre in mind.
-  When the audience member clicks on the search bar
-  Then the search filters all local bands within the search details
+Write each story as: **As a `<role>`, I want `<capability>`, so that `<benefit>`.** Each story includes at least one **Given/When/Then** scenario.
 
-2.2 Provider Stories
-US‑PROV‑001 —
-Story: As a provider, I want … so that …
-Acceptance:
+### 2.1 Customer Stories
 
-Scenario: <happy path>
-  Given <preconditions>
-  When  <action>
-  Then  <observable outcome>
-US‑PROV‑002 —
-Story: As a provider, I want … so that …
-Acceptance:
+- **US‑CUST‑001 —**
+  _Story:_ As an audience member, I want to login and check my local feed.
+  _Acceptance:_
+  ```gherkin
+  Scenario:
+    Given the audience member has an account already
+    When  the audience member opens the app
+    Then  a list of nearby shows are displayed
+  ```
 
-Scenario: <happy path>
-  Given <preconditions>
-  When  <action>
-  Then  <observable outcome>
-2.3 SysAdmin Stories
-US‑ADMIN‑001 —
-Story: As a sysadmin, I want … so that …
-Acceptance:
+- **US‑CUST‑002 —**
+  _Story:_ As an audience member, I want to redirect to apple/google maps to get to the show destination.
+  _Acceptance:_
+  ```gherkin
+  Scenario:
+    Given the audience member is logged in.
+    When  the audience member clicks on destination in the show details
+    Then  redirect to a preferred navigation app
+  ```
 
-Scenario: <happy path>
-  Given <preconditions>
-  When  <action>
-  Then  <observable outcome>
-US‑ADMIN‑002 —
-Story: As a sysadmin, I want … so that …
-Acceptance:
+- **US‑CUST‑003 —**
+  _Story:_ As an audience member, I want to see details for a show including ticket medium, location, price, genre, band lineup.
+  _Acceptance:_
+  ```gherkin
+  Scenario:
+    Given the audience member is on their feed and logged in.
+    When  the audience member clicks on a show
+    Then  they see all of the details of the show
+  ```
 
-Scenario: <happy path>
-  Given <preconditions>
-  When  <action>
-  Then  <observable outcome>
-3. Non‑Functional Requirements (make them measurable)
-Performance: description
-Availability/Reliability: description
-Security/Privacy: description
-Usability: description
-4. Assumptions, Constraints, and Policies
-list any rules, policies, assumptions, etc.
-5. Milestones (course‑aligned)
-M2 Requirements — this file + stories opened as issues.
-M3 High‑fidelity prototype — core customer/provider flows fully interactive.
-M4 Design — architecture, schema, API outline.
-M5 Backend API — key endpoints + tests.
-M6 Increment — ≥2 use cases end‑to‑end.
-M7 Final — complete system & documentation.
-6. Change Management
-Stories are living artifacts; changes are tracked via repository issues and linked pull requests.
-Major changes should update this SRS.
+- **US‑CUST‑004 —**
+  _Story:_ As an audience member, I want to see posters/images for the show.
+  _Acceptance:_
+  ```gherkin
+  Scenario:
+    Given the audience member is on their feed and logged in
+    When  the audience member scrolls through their feed
+    Then  they see all of the shows with marketing images/posters.
+  ```
+
+- **US‑CUST‑005 —**
+  _Story:_ As an audience member, I want to search for local shows.
+  _Acceptance:_
+  ```gherkin
+  Scenario:
+    Given the audience member is logged in and on their feed and has a band or genre in mind.
+    When  the audience member clicks on the search bar
+    Then  the search filters all local bands within the search details
+  ```
+
+### 2.2 Provider Stories
+
+- **US‑PROV‑001 —**
+  _Story:_ As a band, I want to register and login.
+  _Acceptance:_
+  ```gherkin
+  Scenario:
+    Given the band member doesn't have an account
+    When  they fill out the registration form and submit
+    Then  a band account is created and they are logged in to their dashboard.
+  ```
+
+- **US‑PROV‑002 —**
+  _Story:_ As a band member, I want to post a show with details like date, venue, price, and genre, so that local audiences can discover and attend my show.
+  _Acceptance:_
+  ```gherkin
+  Scenario:
+    Given the band member is logged in to their account
+    When  they fill out the show creation form and submit it
+    Then  the show appears on the audience feed with all the entered details
+  ```
+
+- **US‑PROV‑003 —**
+  _Story:_ As a band member, I want to update or delete my show listing, so that I can keep show information accurate or remove a cancelled show.
+  _Acceptance:_
+  ```gherkin
+  Scenario:
+    Given the band member is logged in and has an active show listing
+    When  they edit the show details and save
+    Then  the show listing reflects the updated information on the audience feed
+  ```
+
+- **US‑PROV‑004 —**
+  _Story:_ As a band member, I want to add a venue/location to my show listing, so that audience members know where the show is taking place.
+  _Acceptance:_
+```gherkin
+  Scenario:
+    Given the band member is logged in and creating a show listing
+    When  they enter the venue name and address
+    Then  the venue details are saved and displayed on the show listing
+```
+---
+
+## 3. Non‑Functional Requirements
+
+- **Performance:** The app should be responsive and provide smooth interactions across all screen sizes and devices.
+- **Security/Privacy:** User passwords must be encrypted and user location data must only be used for filtering the local feed.
+- **Usability:** The app must support screen readers and text-to-speech for accessibility.
+
+---
+
+## 4. Assumptions, Constraints, and Policies
+
+- The app is limited to shows and users in the Greensboro, NC area only.
+- All shows posted by bands are assumed to be legitimate and accurate.
+- The app is self-sufficient and will not display advertisements or require third-party monetization.
+---
+
+## 5. Milestones (course‑aligned)
+
+- **M2 Requirements** — this file + stories opened as issues.
+- **M3 High‑fidelity prototype** — core customer/provider flows fully interactive.
+- **M4 Design** — architecture, schema, API outline.
+- **M5 Backend API** — key endpoints + tests.
+- **M6 Increment** — ≥2 use cases end‑to‑end.
+- **M7 Final** — complete system & documentation.
+
+---
+
+## 6. Change Management
+
+- Stories are living artifacts; changes are tracked via repository issues and linked pull requests.
+- Major changes should update this SRS.
