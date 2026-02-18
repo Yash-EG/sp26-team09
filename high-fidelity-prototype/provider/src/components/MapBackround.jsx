@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react'
 import mapboxgl from 'mapbox-gl'
 import 'mapbox-gl/dist/mapbox-gl.css'
+import coliseumImg from '../assets/Coliseum.webp'
 
 mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_TOKEN
 
@@ -13,7 +14,7 @@ export default function MapBackground() {
     if (!mapRef.current) return
     isFlyingRef.current = true
     mapRef.current.flyTo({
-      center: [-79.7920, 36.0726],
+      center: [-79.8080, 36.0660],
       zoom: 15,
       pitch: 70,
       bearing: -30,
@@ -31,7 +32,7 @@ export default function MapBackground() {
       style: 'mapbox://styles/mapbox/dark-v11',
       //style: 'mapbox://styles/mapbox/navigation-night-v1',
       //style: 'mapbox://styles/mapbox/satellite-v9',
-      center: [-79.7920, 36.0726], // Greensboro, NC
+      center: [-79.8080, 36.0660], // Greensboro, NC (centered to include Coliseum)
       zoom: 15,
       pitch: 70,        // tilt for 3D effect
       bearing: -30,     // rotation angle
@@ -56,6 +57,10 @@ export default function MapBackground() {
           true,
           false,
         ])
+      }
+
+      const venueImages = {
+        'Greensboro Coliseum': coliseumImg,
       }
 
       const venues = [
@@ -84,17 +89,20 @@ export default function MapBackground() {
             color: white;
             box-shadow: 0 8px 32px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.05);
           ">
-            <div style="
-              width: 100%;
-              height: 120px;
-              background: linear-gradient(135deg, #1a1a2e 0%, #2d1b4e 100%);
-              display: flex;
-              align-items: center;
-              justify-content: center;
-              border-bottom: 1px solid rgba(168, 85, 247, 0.2);
-            ">
-              <span style="color: rgba(168,85,247,0.4); font-size: 11px; letter-spacing: 3px; text-transform: uppercase;">venue photo</span>
-            </div>
+            ${venueImages[venue.name]
+              ? `<img src="${venueImages[venue.name]}" style="width:100%; height:120px; object-fit:cover; border-bottom:1px solid rgba(168,85,247,0.2);" />`
+              : `<div style="
+                  width: 100%;
+                  height: 120px;
+                  background: linear-gradient(135deg, #1a1a2e 0%, #2d1b4e 100%);
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  border-bottom: 1px solid rgba(168, 85, 247, 0.2);
+                ">
+                  <span style="color: rgba(168,85,247,0.4); font-size: 11px; letter-spacing: 3px; text-transform: uppercase;">venue photo</span>
+                </div>`
+            }
             <div style="padding: 10px 14px 13px;">
               <p style="font-weight: 600; margin: 0 0 5px 0; font-size: 14px;">${venue.name}</p>
               <p style="color: #a855f7; font-size: 11px; margin: 0; letter-spacing: 1px; text-transform: uppercase;">Available for booking</p>
@@ -204,9 +212,21 @@ export default function MapBackground() {
         },
       })
 
-      // Auto rotate — pauses while flying to a venue
+      // Auto rotate — pauses while user interacts or flying to a venue
+      let userInteracting = false
+
+      map.on('mousedown', () => { userInteracting = true })
+      map.on('mouseup', () => { userInteracting = false })
+      map.on('touchstart', () => { userInteracting = true })
+      map.on('touchend', () => { userInteracting = false })
+      map.on('wheel', () => {
+        userInteracting = true
+        clearTimeout(map._wheelTimeout)
+        map._wheelTimeout = setTimeout(() => { userInteracting = false }, 1000)
+      })
+
       const rotate = () => {
-        if (!isFlyingRef.current) {
+        if (!isFlyingRef.current && !userInteracting) {
           map.setBearing(map.getBearing() + 0.02)
         }
         requestAnimationFrame(rotate)
@@ -214,10 +234,14 @@ export default function MapBackground() {
       rotate()
     })
 
-    // Disable user interaction so it stays as a background
-    map.scrollZoom.disable()
-    map.dragPan.disable()
-    map.dragRotate.disable()
+    // Lock panning to Greensboro area
+    const bounds = [
+      [-79.87, 36.04], // southwest
+      [-79.75, 36.10], // northeast
+    ]
+    map.setMaxBounds(bounds)
+    map.setMinZoom(13)
+    map.setMaxZoom(18)
 
     return () => map.remove()
   }, [])
