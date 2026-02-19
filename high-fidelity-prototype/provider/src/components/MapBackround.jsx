@@ -64,17 +64,21 @@ export default function MapBackground() {
       }
 
       const venues = [
-        { name: 'Tanger Center', coords: [-79.7874, 36.0695] },
-        { name: 'Carolina Theatre', coords: [-79.7921, 36.0731] },
-        { name: 'Cone Denim Entertainment Center', coords: [-79.8195, 36.0856] },
-        { name: 'Blind Tiger', coords: [-79.7910, 36.0682] },
-        { name: 'Greene Street Club', coords: [-79.7897, 36.0701] },
-        { name: 'Hops Burger Bar', coords: [-79.7883, 36.0719] },
-        { name: 'UNCG Auditorium', coords: [-79.8059, 36.0669] },
-        { name: 'UNCG Recital Hall', coords: [-79.80774842884561, 36.072706221478114] },
-        { name: 'Greensboro Coliseum', coords: [-79.8257529957848, 36.05955167844715]},
-      ]
-
+  // Major venues (keep these)
+  { name: 'Tanger Center', coords: [-79.7914, 36.0731] }, // 300 N Elm St
+  { name: 'Carolina Theatre', coords: [-79.7921, 36.0731] }, // 310 S Greene St  
+  { name: 'Greensboro Coliseum', coords: [-79.8261, 36.0586] }, // 1921 W Gate City Blvd
+  
+  // Real local music venues (replace your fake ones with these)
+  { name: 'Flat Iron', coords: [-79.7919, 36.0755] }, // 221 Summit Ave - intimate live music venue
+  { name: 'White Oak Amphitheatre', coords: [-79.8242, 36.0532] }, // outdoor amphitheater at coliseum complex
+  { name: 'Hangar 1819', coords: [-79.7892, 36.0698] }, // downtown music venue
+  { name: 'One Thirteen Brewhouse', coords: [-79.7927, 36.0722] }, // rooftop bar with live music
+  
+  // UNCG venues (keep these)
+  { name: 'UNCG Auditorium', coords: [-79.8059, 36.0669] },
+  { name: 'UNCG Recital Hall', coords: [-79.8077, 36.0727] },
+]
       venues.forEach((venue) => {
         const popup = new mapboxgl.Popup({ offset: 25, maxWidth: 'none' }).setHTML(`
           <div style="
