@@ -8,10 +8,9 @@ export default function Navbar() {
   const [searchOpen, setSearchOpen] = useState(false)
 
   const links = [
-    { name: 'Dashboard', path: '/dashboard' },
-    { name: 'Bookings', path: '/bookings' },
+    { name: 'Feed', path: '/feed' },
+    { name: 'My Shows', path: '/bookings' },
     { name: 'Profile', path: '/profile' },
-    { name: 'Availability', path: '/availability' },
   ]
 
   return (
