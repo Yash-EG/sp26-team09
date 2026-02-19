@@ -1,6 +1,8 @@
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 
-export default function SignupCard({ onClose }) {
+export default function SignupCard({ onClose, onSwitch }) {
+  const navigate = useNavigate()
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -13,7 +15,7 @@ export default function SignupCard({ onClose }) {
 
   const handleSubmit = (e) => {
     e.preventDefault()
-    // TODO: handle signup logic
+    navigate('/dashboard')
   }
 
   const inputClass = 'w-full bg-white/10 border border-white/20 text-white px-4 py-3 rounded-lg focus:outline-none focus:border-purple-400/40 placeholder-white/40'
@@ -148,7 +150,7 @@ export default function SignupCard({ onClose }) {
 
         <p className="text-white/70 text-sm text-center mt-6">
           Already have an account?{' '}
-          <button className="text-purple-400 hover:text-purple-300 font-bold">
+          <button type="button" onClick={onSwitch} className="text-purple-400 hover:text-purple-300 font-bold">
             Log In
           </button>
         </p>

@@ -1,11 +1,13 @@
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 
-export default function LoginCard({ onClose }) {
+export default function LoginCard({ onClose, onSwitch }) {
+  const navigate = useNavigate()
   const [formData, setFormData] = useState({ email: '', password: '' })
 
   const handleSubmit = (e) => {
     e.preventDefault()
-    // TODO: handle login logic
+    navigate('/dashboard')
   }
 
   return (
@@ -56,7 +58,7 @@ export default function LoginCard({ onClose }) {
 
         <p className="text-white/70 text-sm text-center mt-6">
           Don't have an account?{' '}
-          <button className="text-purple-400 hover:text-purple-300 font-bold">
+          <button type="button" onClick={onSwitch} className="text-purple-400 hover:text-purple-300 font-bold">
             Sign Up
           </button>
         </p>

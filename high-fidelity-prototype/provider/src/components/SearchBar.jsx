@@ -5,7 +5,6 @@ export default function SearchBar({ onClose }) {
 
   const handleSubmit = (e) => {
     e.preventDefault()
-    // TODO: handle search logic
   }
 
   return (

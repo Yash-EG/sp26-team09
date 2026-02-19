@@ -9,6 +9,7 @@ export default function Navbar() {
 
   const links = [
     { name: 'Dashboard', path: '/dashboard' },
+    { name: 'Feed', path: '/feed' },
     { name: 'Bookings', path: '/bookings' },
     { name: 'Profile', path: '/profile' },
     { name: 'Availability', path: '/availability' },
@@ -16,10 +17,8 @@ export default function Navbar() {
 
   return (
     <div>
-      {/* --- TOP BAR (Logo + Links) --- */}
       <div className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between pointer-events-none">
 
-        {/* Left pill - Logo + Search */}
         <div className="bg-[#111111] backdrop-blur-md rounded-br-4xl px-2 py-3 pointer-events-auto flex items-center gap-3">
           <Link to="/" className="text-white font-bold text-3xl tracking-widest uppercase">
             SceneScout
@@ -27,7 +26,6 @@ export default function Navbar() {
           
         </div>
 
-        {/* Right pill - Nav Links (desktop) */}
         <div className="hidden md:flex bg-[#111111] backdrop-blur-md rounded-bl-4xl px-8 py-3 items-center gap-8 pointer-events-auto">
           {searchOpen ? (
             <SearchBar onClose={() => setSearchOpen(false)} />
@@ -53,14 +51,12 @@ export default function Navbar() {
           ))}
         </div>
 
-        {/* Right pill - Waffle button (mobile) */}
         <div className="md:hidden bg-[#111111] backdrop-blur-md rounded-bl-4xl px-6 py-3 pointer-events-auto">
           <button
             onClick={() => setMenuOpen(!menuOpen)}
             className="text-gray-300 hover:text-white transition-colors focus:outline-none"
             aria-label="Toggle menu"
           >
-            {/* 3×3 waffle icon */}
             <svg width="28" height="28" viewBox="0 0 28 28" fill="currentColor">
               <rect x="2"    y="2"    width="7" height="7" rx="1.5"/>
               <rect x="10.5" y="2"    width="7" height="7" rx="1.5"/>
@@ -76,7 +72,6 @@ export default function Navbar() {
         </div>
       </div>
 
-      {/* Mobile dropdown menu */}
       {menuOpen && (
         <div className="fixed top-0 right-0 z-40 md:hidden">
           <div className="bg-[#111111] backdrop-blur-md rounded-bl-4xl pt-16 pb-6 px-8 flex flex-col gap-6 items-end pointer-events-auto">
@@ -102,16 +97,13 @@ export default function Navbar() {
         <div className="w-2 h-screen bg-[#111111] rounded-full backdrop-blur-sm"></div>
       </div>
 
-      {/* --- BOTTOM BAR --- */}
       <div className="fixed bottom-0 left-0 right-0 z-50 flex items-center justify-between pointer-events-none">
 
-        {/* Left pill - System Online */}
         <div className="bg-[#111111] backdrop-blur-md rounded-tr-4xl px-6 py-3 flex items-center gap-3 pointer-events-auto">
           <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
           <span className="text-xs font-bold text-gray-400 uppercase tracking-widest">System Online</span>
         </div>
 
-        {/* Right pill - Year */}
         <div className="bg-[#111111] backdrop-blur-md rounded-tl-4xl px-8 py-3 pointer-events-auto">
           <span className="text-xl tracking-widest uppercase text-gray-300">2026</span>
         </div>

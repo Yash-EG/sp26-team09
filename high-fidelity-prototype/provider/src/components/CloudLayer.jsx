@@ -2,7 +2,6 @@ export default function CloudLayer() {
   return (
     <div className="fixed inset-0 z-10 pointer-events-none overflow-hidden">
 
-      {/* Cloud 1 */}
       <div
         className="absolute rounded-full opacity-10 blur-3xl"
         style={{
@@ -15,7 +14,6 @@ export default function CloudLayer() {
         }}
       />
 
-      {/* Cloud 2 */}
       <div
         className="absolute rounded-full opacity-10 blur-3xl"
         style={{
@@ -28,7 +26,6 @@ export default function CloudLayer() {
         }}
       />
 
-      {/* Cloud 3 */}
       <div
         className="absolute rounded-full opacity-5 blur-3xl"
         style={{

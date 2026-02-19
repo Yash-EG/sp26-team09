@@ -2,6 +2,13 @@ import { useEffect, useRef } from 'react'
 import mapboxgl from 'mapbox-gl'
 import 'mapbox-gl/dist/mapbox-gl.css'
 import coliseumImg from '../assets/Coliseum.webp'
+import tangerImg from '../assets/tanger.jpg'
+import carolinaImg from '../assets/carolinatheatre.jpg'
+import flatironImg from '../assets/flatiron.jpg'
+import whiteoakImg from '../assets/whiteoak.jpg'
+import one13Img from '../assets/one13.jpg'
+import uncgAudImg from '../assets/uncg_aud.jpg'
+import uncgReciImg from '../assets/uncg_reci.jpg'
 
 mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_TOKEN
 
@@ -61,21 +68,24 @@ export default function MapBackground() {
 
       const venueImages = {
         'Greensboro Coliseum': coliseumImg,
+        'Tanger Center': tangerImg,
+        'Carolina Theatre': carolinaImg,
+        'Flat Iron': flatironImg,
+        'White Oak Amphitheatre': whiteoakImg,
+        'One Thirteen Brewhouse': one13Img,
+        'UNCG Auditorium': uncgAudImg,
+        'UNCG Recital Hall': uncgReciImg,
       }
 
       const venues = [
-  // Major venues (keep these)
-  { name: 'Tanger Center', coords: [-79.7914, 36.0731] }, // 300 N Elm St
-  { name: 'Carolina Theatre', coords: [-79.7921, 36.0731] }, // 310 S Greene St  
-  { name: 'Greensboro Coliseum', coords: [-79.8261, 36.0586] }, // 1921 W Gate City Blvd
   
-  // Real local music venues (replace your fake ones with these)
-  { name: 'Flat Iron', coords: [-79.7919, 36.0755] }, // 221 Summit Ave - intimate live music venue
-  { name: 'White Oak Amphitheatre', coords: [-79.8242, 36.0532] }, // outdoor amphitheater at coliseum complex
-  { name: 'Hangar 1819', coords: [-79.7892, 36.0698] }, // downtown music venue
-  { name: 'One Thirteen Brewhouse', coords: [-79.7927, 36.0722] }, // rooftop bar with live music
-  
-  // UNCG venues (keep these)
+  { name: 'Tanger Center', coords: [-79.7914, 36.0731] },
+  { name: 'Carolina Theatre', coords: [-79.7921, 36.0731] },   
+  { name: 'Greensboro Coliseum', coords: [-79.8261, 36.0586] }, 
+  { name: 'Flat Iron', coords: [-79.7919, 36.0755] }, 
+  { name: 'White Oak Amphitheatre', coords: [-79.8242, 36.0532] },
+  { name: 'Hangar 1819', coords: [-79.7892, 36.0698] }, 
+  { name: 'One Thirteen Brewhouse', coords: [-79.7927, 36.0722] }, 
   { name: 'UNCG Auditorium', coords: [-79.8059, 36.0669] },
   { name: 'UNCG Recital Hall', coords: [-79.8077, 36.0727] },
 ]
@@ -216,7 +226,7 @@ export default function MapBackground() {
         },
       })
 
-      // Auto rotate — pauses while user interacts or flying to a venue
+      // Auto rotate 
       let userInteracting = false
 
       map.on('mousedown', () => { userInteracting = true })
