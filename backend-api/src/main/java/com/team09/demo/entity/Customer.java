@@ -7,12 +7,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
-//TODO: Add location field - it can be nullable
-//TODO: Add field for profile picture URL
-//TODO: Add description field for customer bio
 //TODO: Add relationship for saved shows and favorite bands
-//TODO: Add preferred genres field - it can be a comma-separated string for simplicity
-
 @Entity
 @Table(name = "customers")
 @Data
@@ -25,5 +20,21 @@ public class Customer extends User {
     @Column(nullable = false)
     private String name;
 
+    @Column(length = 1000)
+    private String bio;
+
+    @Column
+    private String profilePictureUrl;
+
+    @Column
+    private String location;
+    
+    @ManyToMany
+    @JoinTable(
+        name = "customer_genres",
+        joinColumns = @JoinColumn(name = "user_id"),
+        inverseJoinColumns = @JoinColumn(name = "genre_id")
+    )
+    private java.util.Set<Genre> preferredGenres = new java.util.HashSet<>();
 
 }

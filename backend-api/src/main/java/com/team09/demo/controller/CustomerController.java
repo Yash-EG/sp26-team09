@@ -9,8 +9,10 @@ import org.springframework.web.bind.annotation.*;
 import com.team09.demo.entity.Customer;
 import com.team09.demo.service.CustomerService;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/api/customers")
@@ -60,6 +62,17 @@ public class CustomerController {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
 
+        }
+
+        @PutMapping("/{id}/genres")
+        public ResponseEntity<Customer> updateCustomerPreferredGenres(@PathVariable Long id, @RequestBody List<Long> genreIds) {
+            try {
+                Customer updatedCustomer = customerService.setCustomerPreferredGenres(id, new HashSet<>(genreIds));
+                return new ResponseEntity<>(updatedCustomer, HttpStatus.OK);
+            } catch (RuntimeException e) {
+                System.out.println("Error setting preferred genres: " + e.getMessage());
+                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            }
         }
 
         @DeleteMapping("/{id}")
