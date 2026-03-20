@@ -7,8 +7,10 @@ import org.springframework.web.bind.annotation.*;
 
 import com.team09.demo.entity.Band;
 import com.team09.demo.entity.Customer;
+import com.team09.demo.entity.Show;
 import com.team09.demo.service.CustomerService;
 import com.team09.demo.service.FollowService;
+import com.team09.demo.service.InterestedService;
 
 import java.util.HashSet;
 import java.util.List;
@@ -24,6 +26,9 @@ public class CustomerController {
     @Autowired
     private FollowService followService;
 
+    @Autowired
+    private InterestedService interestedService;
+
     @PostMapping
     public ResponseEntity<Customer> createCustomer(@RequestBody Customer customer) {
         Customer createdCustomer = customerService.createCustomer(customer);
@@ -37,6 +42,16 @@ public class CustomerController {
             return new ResponseEntity<>(HttpStatus.CREATED);
         } catch (RuntimeException e) {
             System.out.println("Error following band: " + e.getMessage());
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+    }
+    @PostMapping("/{id}/interested/{showId}")
+    public ResponseEntity<Void> markInterested(@PathVariable Long id, @PathVariable Long showId) {
+        try {
+            interestedService.markInterested(id, showId);
+            return new ResponseEntity<>(HttpStatus.CREATED);
+        } catch (RuntimeException e) {
+            System.out.println("Error marking interested: " + e.getMessage());
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
     }
@@ -67,6 +82,12 @@ public class CustomerController {
             List<Band> followedBands = followService.getFollowedBands(id);
             return new ResponseEntity<>(followedBands, HttpStatus.OK);
             
+    }
+
+    @GetMapping("/{id}/interested")
+    public ResponseEntity<List<Show>> getInterestedShows(@PathVariable Long customerId) {
+        List<Show> interestedShows = interestedService.getInterestedShows(customerId);
+        return new ResponseEntity<>(interestedShows, HttpStatus.OK);
     }
 
     @PutMapping("/{id}")
@@ -113,5 +134,21 @@ public class CustomerController {
                 return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
             }
         }
+         @DeleteMapping("/{id}/interested/{showId}")
+    public ResponseEntity<Void> unmarkInterested(@PathVariable Long customerId, @PathVariable Long showId) {
+        try {
+            interestedService.unmarkInterested(customerId, showId);
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        } catch (RuntimeException e) {
+            System.out.println("Error unmarking interested: " + e.getMessage());
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+    }
+
+        
+
+    
+
+   
 
 }
