@@ -2,17 +2,17 @@ package com.team09.demo.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import com.team09.demo.entity.Band;
 import com.team09.demo.entity.Customer;
 import com.team09.demo.service.CustomerService;
+import com.team09.demo.service.FollowService;
 
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 @RestController
 @RequestMapping("/api/customers")
@@ -21,10 +21,24 @@ public class CustomerController {
     @Autowired
     private CustomerService customerService;
 
+    @Autowired
+    private FollowService followService;
+
     @PostMapping
     public ResponseEntity<Customer> createCustomer(@RequestBody Customer customer) {
         Customer createdCustomer = customerService.createCustomer(customer);
         return new ResponseEntity<>(createdCustomer, HttpStatus.CREATED);
+    }
+
+    @PostMapping("/{id}/follow/{bandId}")
+    public ResponseEntity<Void> followBand(@PathVariable Long id, @PathVariable Long bandId) {
+        try {
+            followService.followBand(id, bandId);
+            return new ResponseEntity<>(HttpStatus.CREATED);
+        } catch (RuntimeException e) {
+            System.out.println("Error following band: " + e.getMessage());
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
     }
 
     @GetMapping
@@ -47,6 +61,14 @@ public class CustomerController {
         : new ResponseEntity<>(HttpStatus.NOT_FOUND);
 
     }
+
+    @GetMapping("/{id}/following")
+    public ResponseEntity<List<Band>> getFollowedBands(@PathVariable Long id) {
+            List<Band> followedBands = followService.getFollowedBands(id);
+            return new ResponseEntity<>(followedBands, HttpStatus.OK);
+            
+    }
+
     @PutMapping("/{id}")
         public ResponseEntity<Customer> updateCustomer(@PathVariable Long id, @RequestBody Customer customer) {
         Optional<Customer> updatedCustomer = customerService.getCustomerById(id);
@@ -80,4 +102,16 @@ public class CustomerController {
             customerService.deleteCustomer(id);
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
+
+        @DeleteMapping("/{id}/follow/{bandId}")
+        public ResponseEntity<Void> unfollowBand(@PathVariable Long id, @PathVariable Long bandId) {
+            try {
+                followService.unfollowBand(id, bandId);
+                return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+            } catch (RuntimeException e) {
+                System.out.println("Error unfollowing band: " + e.getMessage());
+                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            }
+        }
+
 }
