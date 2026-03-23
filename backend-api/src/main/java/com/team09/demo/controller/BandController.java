@@ -53,8 +53,4 @@ public class BandController {
     public List<Band> getBandsByGenre(@PathVariable String genre) {
         return bandService.getBandsByGenre(genre);
     }
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> origin/main

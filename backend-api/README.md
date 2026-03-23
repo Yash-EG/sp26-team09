@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # Scene Scout - Backend API Documentation
 
 **Version:** 1.0
@@ -15,6 +14,8 @@
 4. [API Endpoints](#4-api-endpoints)
    - [Band Management](#band-management)
    - [Show Management](#show-management)
+   - [Customer Management](#customer-management)
+   - [Genre Management](#genre-management)
 5. [Use Case Mapping](#5-use-case-mapping)
 
 ---
@@ -80,48 +81,12 @@ Content-Type: application/json
   "instagram": "@thestrokes",
   "spotify": "thestrokes",
   "soundcloud": "thestrokes"
-=======
-# Customer API & Use Case Documentation
-
-
-
-## 1. Customer Actions
-Customers can:
-- Create and manage their profile  
-- Set preferred genres  
-- Follow bands  
-- Mark interest in shows  
-- View local show listings  
-
-
-## 2. Customer Endpoints
-
-
-#### Create Customer
-**Endpoint:** `POST /api/customers`  
-**Description:** Create a new customer account.
-
-```http
-POST /api/customers
-Content-Type: application/json
-
-{
-  "email": "john@example.com",
-  "passwordHash": "hashedpassword123",
-  "role": "CUSTOMER",
-  "status": "ACTIVE",
-  "name": "John Doe",
-  "bio": "This is a bio",
-  "location": "Greensboro, NC",
-  "profilePictureUrl": "https://example.com/pfp.jpg"
->>>>>>> origin/main
 }
 ```
 
 **Response:**
 ```json
 {
-<<<<<<< HEAD
   "userId": 1,
   "email": "thestrokes@example.com",
   "role": "BAND",
@@ -154,37 +119,12 @@ Content-Type: application/json
 
 ```http
 GET /bands
-=======
-  "userId": 9,
-  "email": "john@example.com",
-  "role": "CUSTOMER",
-  "status": "ACTIVE",
-  "name": "John Doe",
-  "bio": "This is a bio",
-  "location": "Greensboro, NC",
-  "profilePictureUrl": "https://example.com/pfp.jpg",
-  "preferredGenres": []
-}
-```
-
-**Status Code:** `201 Created`
-
----
-
-#### Get All Customers
-**Endpoint:** `GET /api/customers`  
-**Description:** Retrieve all customers
-
-```http
-GET /api/customers
->>>>>>> origin/main
 ```
 
 **Status Code:** `200 OK`
 
 ---
 
-<<<<<<< HEAD
 #### Get Band by ID
 **Endpoint:** `GET /bands/{id}`
 **Use Case:** View a specific band's profile
@@ -192,21 +132,12 @@ GET /api/customers
 
 ```http
 GET /bands/1
-=======
-#### Get Customer by ID
-**Endpoint:** `GET /api/customers/{id}`  
-**Description:** Retrieve a specific customer by ID.
-
-```http
-GET /api/customers/9
->>>>>>> origin/main
 ```
 
 **Status Code:** `200 OK` or `404 Not Found`
 
 ---
 
-<<<<<<< HEAD
 #### Get Bands by Genre
 **Endpoint:** `GET /bands/genre/{genre}`
 **Use Case:** Genre-based band discovery
@@ -240,96 +171,10 @@ Content-Type: application/json
 
 **Response:** Updated band object
 
-=======
-#### Get Customer by Email
-**Endpoint:** `GET /api/customers/email/{email}`  
-**Description:** Retrieve a customer by email address.
-
-```http
-GET /api/customers/email/john@example.com
-```
-
-**Status Code:** `200 OK` or `404 Not Found`
-
----
-
-#### Update Customer
-**Endpoint:** `PUT /api/customers/{id}`  
-**Description:** Update customer profile information.
-
-```http
-PUT /api/customers/9
-Content-Type: application/json
-
-{
-  "email": "john123@example.com",
-  "name": "John Doe",
-  "bio": "Updated bio",
-  "location": "Greensboro, NC",
-  "profilePictureUrl": "https://example.com/pfp.jpg"
-}
-```
-
-**Response:** Updated customer object  
-**Status Code:** `200 OK` or `404 Not Found`
-
----
-
-#### Update Customer Preferred Genres
-**Endpoint:** `PUT /api/customers/{id}/genres`  
-**Description:** Set a customer's preferred genres by genre IDs.
-
-```http
-PUT /api/customers/9/genres
-Content-Type: application/json
-
-[1, 2, 3]
-```
-
-**Response:** Updated customer object with preferred genres  
-**Status Code:** `200 OK` or `400 Bad Request`
-
----
-
-#### Follow a Band
-**Endpoint:** `POST /api/customers/{id}/follow/{bandId}`  
-**Description:** Follow a band as a customer.
-
-```http
-POST /api/customers/9/follow/2
-```
-
-**Status Code:** `201 Created` or `400 Bad Request`
-
----
-
-#### Unfollow a Band
-**Endpoint:** `DELETE /api/customers/{id}/follow/{bandId}`  
-**Description:** Unfollow a band.
-
-```http
-DELETE /api/customers/9/follow/2
-```
-
-**Status Code:** `204 No Content` or `400 Bad Request`
-
----
-
-#### Get Followed Bands
-**Endpoint:** `GET /api/customers/{id}/following`  
-**Description:** Get all bands a customer follows.
-
-```http
-GET /api/customers/9/following
-```
-
-**Response:** Array of band objects  
->>>>>>> origin/main
 **Status Code:** `200 OK`
 
 ---
 
-<<<<<<< HEAD
 #### Delete Band Profile
 **Endpoint:** `DELETE /bands/{id}`
 **Use Case:** Account removal
@@ -368,38 +213,12 @@ Content-Type: application/json
   "ageRestriction": "All Ages",
   "lineup": "The Strokes, Opening Act TBA",
   "showStatus": "ACTIVE"
-=======
-#### Mark Interest in a Show
-**Endpoint:** `POST /api/customers/{id}/interested/{showId}`  
-**Description:** Mark a customer as interested in a show.
-
-```http
-POST /api/customers/9/interested/1
-```
-
-**Status Code:** `200 OK` or `400 Bad Request`
-
----
-### 3. Genre Endpoints 
-
-#### Create Genre
-**Endpoint:** `POST /api/genres`  
-**Description:** Create a new genre.
-
-```http
-POST /api/genres
-Content-Type: application/json
-
-{
-  "name": "Rock"
->>>>>>> origin/main
 }
 ```
 
 **Response:**
 ```json
 {
-<<<<<<< HEAD
   "showId": 10,
   "band": { "userId": 1, "name": "The Strokes" },
   "ticketPrice": 10.00,
@@ -428,40 +247,12 @@ Content-Type: application/json
 
 ```http
 GET /shows
-=======
-  "genreId": 1,
-  "name": "Rock"
-}
-```
-
-**Status Code:** `201 Created`
-
----
-
-#### Get All Genres
-**Endpoint:** `GET /api/genres`  
-**Description:** Retrieve all genres.
-
-```http
-GET /api/genres
-```
-
-**Response:**
-```json
-[
-  { "genreId": 1, "name": "Rock" },
-  { "genreId": 2, "name": "Metal" },
-  { "genreId": 3, "name": "Hip-Hop" },
-  { "genreId": 4, "name": "Indie" }
-]
->>>>>>> origin/main
 ```
 
 **Status Code:** `200 OK`
 
 ---
 
-<<<<<<< HEAD
 #### Get Show by ID
 **Endpoint:** `GET /shows/{id}`
 **Use Case:** US-CUST-003 (View Show Details)
@@ -540,6 +331,198 @@ DELETE /shows/10
 
 ---
 
+### Customer Management
+
+#### Create Customer
+**Endpoint:** `POST /api/customers`
+**Description:** Create a new customer account.
+
+```http
+POST /api/customers
+Content-Type: application/json
+
+{
+  "email": "john@example.com",
+  "passwordHash": "hashedpassword123",
+  "role": "CUSTOMER",
+  "status": "ACTIVE",
+  "name": "John Doe",
+  "bio": "This is a bio",
+  "location": "Greensboro, NC",
+  "profilePictureUrl": "https://example.com/pfp.jpg"
+}
+```
+
+**Response:**
+```json
+{
+  "userId": 9,
+  "email": "john@example.com",
+  "role": "CUSTOMER",
+  "status": "ACTIVE",
+  "name": "John Doe",
+  "bio": "This is a bio",
+  "location": "Greensboro, NC",
+  "profilePictureUrl": "https://example.com/pfp.jpg",
+  "preferredGenres": []
+}
+```
+
+**Status Code:** `201 Created`
+
+---
+
+#### Get All Customers
+**Endpoint:** `GET /api/customers`
+**Description:** Retrieve all customers.
+
+```http
+GET /api/customers
+```
+
+**Status Code:** `200 OK`
+
+---
+
+#### Get Customer by ID
+**Endpoint:** `GET /api/customers/{id}`
+**Description:** Retrieve a specific customer by ID.
+
+```http
+GET /api/customers/9
+```
+
+**Status Code:** `200 OK` or `404 Not Found`
+
+---
+
+#### Get Customer by Email
+**Endpoint:** `GET /api/customers/email/{email}`
+**Description:** Retrieve a customer by email address.
+
+```http
+GET /api/customers/email/john@example.com
+```
+
+**Status Code:** `200 OK` or `404 Not Found`
+
+---
+
+#### Update Customer
+**Endpoint:** `PUT /api/customers/{id}`
+**Description:** Update customer profile information.
+
+```http
+PUT /api/customers/9
+Content-Type: application/json
+
+{
+  "email": "john123@example.com",
+  "name": "John Doe",
+  "bio": "Updated bio",
+  "location": "Greensboro, NC",
+  "profilePictureUrl": "https://example.com/pfp.jpg"
+}
+```
+
+**Status Code:** `200 OK` or `404 Not Found`
+
+---
+
+#### Update Customer Preferred Genres
+**Endpoint:** `PUT /api/customers/{id}/genres`
+**Description:** Set a customer's preferred genres by genre IDs.
+
+```http
+PUT /api/customers/9/genres
+Content-Type: application/json
+
+[1, 2, 3]
+```
+
+**Status Code:** `200 OK` or `400 Bad Request`
+
+---
+
+#### Follow a Band
+**Endpoint:** `POST /api/customers/{id}/follow/{bandId}`
+**Description:** Follow a band as a customer.
+
+```http
+POST /api/customers/9/follow/2
+```
+
+**Status Code:** `201 Created` or `400 Bad Request`
+
+---
+
+#### Unfollow a Band
+**Endpoint:** `DELETE /api/customers/{id}/follow/{bandId}`
+**Description:** Unfollow a band.
+
+```http
+DELETE /api/customers/9/follow/2
+```
+
+**Status Code:** `204 No Content` or `400 Bad Request`
+
+---
+
+#### Get Followed Bands
+**Endpoint:** `GET /api/customers/{id}/following`
+**Description:** Get all bands a customer follows.
+
+```http
+GET /api/customers/9/following
+```
+
+**Status Code:** `200 OK`
+
+---
+
+#### Mark Interest in a Show
+**Endpoint:** `POST /api/customers/{id}/interested/{showId}`
+**Description:** Mark a customer as interested in a show.
+
+```http
+POST /api/customers/9/interested/1
+```
+
+**Status Code:** `200 OK` or `400 Bad Request`
+
+---
+
+### Genre Management
+
+#### Create Genre
+**Endpoint:** `POST /api/genres`
+**Description:** Create a new genre.
+
+```http
+POST /api/genres
+Content-Type: application/json
+
+{
+  "name": "Rock"
+}
+```
+
+**Status Code:** `201 Created`
+
+---
+
+#### Get All Genres
+**Endpoint:** `GET /api/genres`
+**Description:** Retrieve all genres.
+
+```http
+GET /api/genres
+```
+
+**Status Code:** `200 OK`
+
+---
+
 ## 5. Use Case Mapping
 
 ### Provider (Band) Use Cases — Yash Patel
@@ -551,18 +534,14 @@ DELETE /shows/10
 | **US-PROV-003** | Update or delete show listings | `PUT /shows/{id}`, `DELETE /shows/{id}` |
 | **US-PROV-004** | Add venue and location to shows | `POST /shows` (`location`, `venueAddress` fields), `PUT /shows/{id}` |
 
-=======
-## 4. Use Case Mapping
-
-### Customer Use Cases
+### Customer Use Cases — Bridger Hansen
 
 | Use Case | Description | Related Endpoints |
 |----------|-------------|-------------------|
-| **US-CUST-001**  | Create/manage customer profile | `POST /api/customers`, `PUT /api/customers/{id}` |
+| **US-CUST-001** | Create/manage customer profile | `POST /api/customers`, `PUT /api/customers/{id}` |
 | **US-CUST-002** | Login and view local feed | `GET /shows`, `GET /shows/genre/{genre}` |
 | **US-CUST-003** | View show details | `GET /shows/{id}` |
-| **US-CUST-004** | Save/bookmark shows | `POST /api/customers/{id}/interested/{showId}`, `GET /api/customers/{id}/interested` |
-| **US-CUST-005**  | Follow bands | `POST /api/customers/{id}/follow/{bandId}`, `GET /api/customers/{id}/following` |
+| **US-CUST-004** | Save/bookmark shows | `POST /api/customers/{id}/interested/{showId}` |
+| **US-CUST-005** | Follow bands | `POST /api/customers/{id}/follow/{bandId}`, `GET /api/customers/{id}/following` |
 | **US-CUST-006** | Search for local shows | `GET /shows/genre/{genre}`, `GET /bands/genre/{genre}` |
 | **US-CUST-007** | Set preferred genres | `PUT /api/customers/{id}/genres` |
->>>>>>> origin/main
