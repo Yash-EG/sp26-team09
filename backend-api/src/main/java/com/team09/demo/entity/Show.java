@@ -48,4 +48,8 @@ public class Show {
     private String lineup;
 
     private String showStatus;
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> origin/main
