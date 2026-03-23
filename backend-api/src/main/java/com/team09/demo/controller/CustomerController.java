@@ -135,9 +135,9 @@ public class CustomerController {
             }
         }
          @DeleteMapping("/{id}/interested/{showId}")
-    public ResponseEntity<Void> unmarkInterested(@PathVariable Long customerId, @PathVariable Long showId) {
+    public ResponseEntity<Void> unmarkInterested(@PathVariable Long id, @PathVariable Long showId) {
         try {
-            interestedService.unmarkInterested(customerId, showId);
+            interestedService.unmarkInterested(id, showId);
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         } catch (RuntimeException e) {
             System.out.println("Error unmarking interested: " + e.getMessage());
