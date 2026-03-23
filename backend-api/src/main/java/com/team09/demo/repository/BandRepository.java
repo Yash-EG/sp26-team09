@@ -10,8 +10,4 @@ import java.util.List;
 public interface BandRepository extends JpaRepository<Band, Long> {
     Band findByEmail(String email);
     List<Band> findByGenre(String genre);
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> origin/main

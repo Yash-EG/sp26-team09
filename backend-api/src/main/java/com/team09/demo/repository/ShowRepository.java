@@ -11,8 +11,4 @@ public interface ShowRepository extends JpaRepository<Show, Long> {
     List<Show> findByBandUserId(Long bandId);
     List<Show> findByGenre(String genre);
     List<Show> findByShowStatus(String showStatus);
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> origin/main
