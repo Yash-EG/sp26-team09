@@ -7,7 +7,6 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
-//TODO: Add relationship for saved shows and favorite bands
 @Entity
 @Table(name = "customers")
 @Data
@@ -17,18 +16,23 @@ import lombok.NoArgsConstructor;
 @PrimaryKeyJoinColumn(name = "user_id")
 public class Customer extends User {
     
+    // Common user fields inherited from User (id, email, password, role)
     @Column(nullable = false)
     private String name;
 
+    //User bio field with max length of 1000 characters
     @Column(length = 1000)
     private String bio;
 
+    // Optional profile picture URL
     @Column
     private String profilePictureUrl;
 
+    // Optional location field
     @Column
     private String location;
     
+    // Many-to-many relationship with Genre for preferred genres
     @ManyToMany
     @JoinTable(
         name = "customer_genres",

@@ -22,19 +22,22 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 
 public class Interested {
-    
+    // Primary key for Interested
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    // Many-to-one relationship to Customer and Show
     @ManyToOne
     @JoinColumn(name = "customer_id", nullable = false)
     private Customer customer;
 
+    // Many-to-one relationship to Show
     @ManyToOne
     @JoinColumn(name = "show_id", nullable = false)
     private Show show;
 
+    // Timestamp for when it was marked interested
     private LocalDateTime interestedAt;
     
 

@@ -19,15 +19,18 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class Follow {
     
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     
+    // Many-to-one relationship to Customer and Band
     @ManyToOne
     private Customer customer;
-
+    // Many-to-one relationship to Band
     @ManyToOne
     private Band band;
 
+    // Timestamp for when the follow was created
     private LocalDateTime followedAt;
 }

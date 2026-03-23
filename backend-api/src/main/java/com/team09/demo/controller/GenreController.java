@@ -17,15 +17,18 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @RestController
 @RequestMapping("/api/genres")
 public class GenreController {
+    
     @Autowired
     private GenreService genreService;
 
+    // POST /genres — Create new genre
     @PostMapping
     public ResponseEntity<Genre> createGenre(@RequestBody Genre genre) {
         Genre createdGenre = genreService.createGenre(genre);
         return ResponseEntity.status(201).body(createdGenre);
     }
 
+    // GET /genres — Get all genres
     @GetMapping
     public ResponseEntity<List<Genre>> getAllGenres() {
         return ResponseEntity.ok(genreService.getAllGenres());
