@@ -12,29 +12,52 @@ import java.util.Optional;
 import java.util.Set;
 
 
-//TODO: Add to updateCustomer to have description, profilePictureURL, location, preferredGenres
-//TODO: Add logic for bookmarking/saving shows and following bands
 
 
 @Service
+/**
+ * Service class for managing Customer entities. 
+ */
 public class CustomerService {
+    // Autowire the CustomerRepository and GenreRepository to interact with the database
     @Autowired
     private CustomerRepository customerRepository;
 
+    // Autowire GenreRepository to manage genres related to customers
     @Autowired
     private GenreRepository genreRepository;
 
+    /**
+     * Method to create a new customer profile
+     * @param customer the customer to be created
+     * @return the created customer
+     */
     public Customer createCustomer(Customer customer) {
         return customerRepository.save(customer);
     }
+    /**
+     * Method to retrieve a customer by their ID
+     * @param id the ID of the customer to retrieve
+     * @return the retrieved customer
+     */
     public Optional<Customer> getCustomerById(Long id) {
         return customerRepository.findById(id);
     }
 
+    /**
+     * Method to retrieve all customers
+     * @return the list of all customers
+     */
     public List<Customer> getAllCustomers() {
         return customerRepository.findAll();
     }
 
+    /**
+     * Method to update existing customers
+     * @param id the ID of the customer to update
+     * @param customerDetails the updated customer details
+     * @return the updated customer
+     */
     public Customer updateCustomer(Long id, Customer customerDetails){
         return customerRepository.findById(id).map(customer -> {
             if(customerDetails.getEmail() != null) {
@@ -57,14 +80,29 @@ public class CustomerService {
 
     }
 
+    /**
+     * Method to delete a customer by their ID
+     * @param id the ID of the customer to delete
+     */
     public void deleteCustomer(Long id){
         customerRepository.deleteById(id);
     }
 
+    /**
+     * Method to retrieve a customer by their email address
+     * @param email the email address of the customer to retrieve
+     * @return the retrieved customer
+     */
     public Customer getCustomerByEmail(String email) {
         return customerRepository.findByEmail(email);
     }
 
+    /**
+     * Method to set preferred genres for a customer
+     * @param id the ID of the customer
+     * @param genreIds the set of genre IDs to set as preferred
+     * @return the updated customer
+     */
     public Customer setCustomerPreferredGenres(Long id, Set<Long> genreIds) {
         return customerRepository.findById(id).map(customer -> {
             Set<Genre> genres = new HashSet<>(genreRepository.findAllById(genreIds));

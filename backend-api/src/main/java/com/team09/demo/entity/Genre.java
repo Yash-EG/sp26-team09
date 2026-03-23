@@ -11,10 +11,11 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Genre {
+    // Primary key for Genre
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long genreId;
-
+    // Genre name must be unique and not null
     @Column(nullable = false, unique = true)
     private String name;
 }

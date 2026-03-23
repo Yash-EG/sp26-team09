@@ -29,12 +29,14 @@ public class CustomerController {
     @Autowired
     private InterestedService interestedService;
 
+    // POST /customers — Create customer profile
     @PostMapping
     public ResponseEntity<Customer> createCustomer(@RequestBody Customer customer) {
         Customer createdCustomer = customerService.createCustomer(customer);
         return new ResponseEntity<>(createdCustomer, HttpStatus.CREATED);
     }
 
+    // POST /customers/{id}/follow/{bandId} — Follow a band
     @PostMapping("/{id}/follow/{bandId}")
     public ResponseEntity<Void> followBand(@PathVariable Long id, @PathVariable Long bandId) {
         try {
@@ -45,6 +47,7 @@ public class CustomerController {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
     }
+    // POST /customers/{id}/interested/{showId} — Mark show as interested
     @PostMapping("/{id}/interested/{showId}")
     public ResponseEntity<Void> markInterested(@PathVariable Long id, @PathVariable Long showId) {
         try {
@@ -56,12 +59,14 @@ public class CustomerController {
         }
     }
 
+    // GET /customers — Get all customers
     @GetMapping
     public ResponseEntity<List<Customer>> getAllCustomers() {
         List<Customer> customers = customerService.getAllCustomers();
         return new ResponseEntity<>(customers, HttpStatus.OK);
     }
 
+    // GET /customers/{id} — Get customer by ID
     @GetMapping("/{id}")
     public ResponseEntity<Customer> getCustomerById(@PathVariable Long id) {
         Optional<Customer> customer = customerService.getCustomerById(id);
@@ -69,6 +74,7 @@ public class CustomerController {
                 .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
+    // GET /customers/email/{email} — Get customer by email
     @GetMapping("/email/{email}")
     public ResponseEntity<Customer> getCustomerByEmail(@PathVariable String email) {
         Customer customer = customerService.getCustomerByEmail(email);
@@ -77,6 +83,7 @@ public class CustomerController {
 
     }
 
+    // GET /customers/{id}/following — Get bands followed by customer
     @GetMapping("/{id}/following")
     public ResponseEntity<List<Band>> getFollowedBands(@PathVariable Long id) {
             List<Band> followedBands = followService.getFollowedBands(id);
@@ -84,12 +91,14 @@ public class CustomerController {
             
     }
 
+    // GET /customers/{id}/interested — Get shows marked as interested
     @GetMapping("/{id}/interested")
     public ResponseEntity<List<Show>> getInterestedShows(@PathVariable Long id) {
         List<Show> interestedShows = interestedService.getInterestedShows(id);
         return new ResponseEntity<>(interestedShows, HttpStatus.OK);
     }
 
+    // PUT /customers/{id} — Update customer profile
     @PutMapping("/{id}")
         public ResponseEntity<Customer> updateCustomer(@PathVariable Long id, @RequestBody Customer customer) {
         Optional<Customer> updatedCustomer = customerService.getCustomerById(id);
@@ -107,6 +116,7 @@ public class CustomerController {
 
         }
 
+        // PUT /customers/{id}/genres — Update customer preferred genres
         @PutMapping("/{id}/genres")
         public ResponseEntity<Customer> updateCustomerPreferredGenres(@PathVariable Long id, @RequestBody List<Long> genreIds) {
             try {
@@ -118,12 +128,14 @@ public class CustomerController {
             }
         }
 
+        // DELETE /customers/{id} — Delete customer profile
         @DeleteMapping("/{id}")
         public ResponseEntity<Void> deleteCustomer(@PathVariable Long id) {
             customerService.deleteCustomer(id);
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
 
+        // DELETE /customers/{id}/follow/{bandId} — Unfollow a band
         @DeleteMapping("/{id}/follow/{bandId}")
         public ResponseEntity<Void> unfollowBand(@PathVariable Long id, @PathVariable Long bandId) {
             try {
@@ -134,10 +146,11 @@ public class CustomerController {
                 return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
             }
         }
+        // DELETE /customers/{id}/interested/{showId} — Unmark show as interested
          @DeleteMapping("/{id}/interested/{showId}")
-    public ResponseEntity<Void> unmarkInterested(@PathVariable Long customerId, @PathVariable Long showId) {
+    public ResponseEntity<Void> unmarkInterested(@PathVariable Long id, @PathVariable Long showId) {
         try {
-            interestedService.unmarkInterested(customerId, showId);
+            interestedService.unmarkInterested(id, showId);
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         } catch (RuntimeException e) {
             System.out.println("Error unmarking interested: " + e.getMessage());
