@@ -59,4 +59,8 @@ public class ShowController {
         showService.deleteShow(id);
         return ResponseEntity.noContent().build();
     }
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> origin/main

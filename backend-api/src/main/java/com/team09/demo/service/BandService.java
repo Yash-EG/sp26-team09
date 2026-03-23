@@ -58,4 +58,8 @@ public class BandService {
     public List<Band> getBandsByGenre(String genre) {
         return bandRepository.findByGenre(genre);
     }
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> origin/main

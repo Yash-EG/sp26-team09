@@ -45,4 +45,8 @@ public class Band extends User {
     private String spotify;
 
     private String soundcloud;
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> origin/main
