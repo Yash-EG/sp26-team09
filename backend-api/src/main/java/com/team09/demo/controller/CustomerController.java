@@ -85,8 +85,8 @@ public class CustomerController {
     }
 
     @GetMapping("/{id}/interested")
-    public ResponseEntity<List<Show>> getInterestedShows(@PathVariable Long customerId) {
-        List<Show> interestedShows = interestedService.getInterestedShows(customerId);
+    public ResponseEntity<List<Show>> getInterestedShows(@PathVariable Long id) {
+        List<Show> interestedShows = interestedService.getInterestedShows(id);
         return new ResponseEntity<>(interestedShows, HttpStatus.OK);
     }
 
