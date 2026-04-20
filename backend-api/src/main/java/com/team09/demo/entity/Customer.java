@@ -25,7 +25,8 @@ public class Customer extends User {
     private String bio;
 
     // Optional profile picture URL
-    @Column
+
+    @Column()
     private String profilePictureUrl;
 
     // Optional location field

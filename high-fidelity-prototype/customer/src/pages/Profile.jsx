@@ -1,57 +1,186 @@
 //imports react hook for nav and necessary components
-import { useState } from 'react';
+import { useState,useEffect } from 'react';
 import Navbar from "../components/Navbar";
 import MapBackground from '../components/MapBackround'
 import CloudLayer from '../components/CloudLayer'
 
 export default function Profile() {
+
+  
+  const customerId = localStorage.getItem("customerId");
+  //state variable, remembers if editing , sets boolean value if changes
   const [isEditing, setIsEditing] = useState(false);
-  //temporary hardcoded profile data until we connect to backend
+
+  //state variable, remembers prev profile data and sets new data
   const [profileData, setProfileData] = useState({
-    name: 'John Doe',
-    location: 'Greensboro, NC',
-    bio: 'Live music lover exploring the local scene. Always on the lookout for new bands and unforgettable shows. From intimate jazz clubs to high-energy rock concerts, I\'m there for it all. Let\'s discover great music together!',
+    name: '',
+    location: '',
+    bio: '',
     profileImage: null
   });
-//function to handle profile image upload
-  const handleImageUpload = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setProfileData({...profileData, profileImage: reader.result});
+
+  const [message, setMessage] = useState("");
+
+  //state variable, remembers full customer object from backend, sets customer based on state
+  const [customer, setCustomer] = useState(null);
+
+  //remembers all genres on backend, 
+  const [allGenres, setAllGenres] = useState([]);
+  
+  //remembers selected genres, sets new selected genres
+  const [selectedGenreIds, setSelectedGenreIds] = useState([]);
+    //if no customer is logged in, return message
+    if (!customerId) {
+      return <div className="text-white p-8">Customer is not logged in.</div>;
+    }
+
+//fetches customer profile data and genres from backend on component mount, sets state variables accordingly
+useEffect(() => {
+  const fetchData = async () => {
+    try {
+      // fetch customer profile
+      const customerResponse = await fetch(`http://localhost:8080/api/customers/${customerId}`);
+      if (!customerResponse.ok) {
+        throw new Error("Failed to fetch customer");
+      }
+      //receive response in json format
+      const customerData = await customerResponse.json();
+
+      //setcustomers data with fetched data
+      setCustomer(customerData);
+      //if no data set blank values, if data exists set profile data with fetched data
+      setProfileData({
+        name: customerData.name || '',
+        location: customerData.location || '',
+        bio: customerData.bio || '',
+        profileImage: customerData.profilePictureUrl || null
+      });
+
+      //set selected genres with fetched data, if no genres set empty array
+      setSelectedGenreIds(
+      (customerData.preferredGenres || []).map((genre) => genre.genreId)
+      );
+
+      // fetch all genres for buttons
+      const genresResponse = await fetch(`http://localhost:8080/api/genres`);
+      if (!genresResponse.ok) {
+        throw new Error("Failed to fetch genres");
+      }
+      //receive response in json format
+      const genresData = await genresResponse.json();
+      setAllGenres(genresData);
+
+      // fetch followed bands
+      const bandsResponse = await fetch(`http://localhost:8080/api/customers/${customerId}/following`);
+      if (!bandsResponse.ok) {
+        throw new Error("Failed to fetch followed bands");
+      }
+      //receive response in json format
+      const bandsData = await bandsResponse.json();
+      setFollowedBands(bandsData);
+
+    } catch (error) {
+      console.error(error);
+      setMessage("Failed to load profile data.");
+    }
+  };
+
+  fetchData();
+}, []);
+
+//function to handle toggling genre selection, adds or removes genre id from selected genres array
+      const handleGenreToggle = (genreId) => {
+        setSelectedGenreIds((prev) =>
+          prev.includes(genreId)
+            ? prev.filter((id) => id !== genreId)
+            : [...prev, genreId]
+        );
       };
-      reader.readAsDataURL(file);
+
+      //state variable, remembers followed bands, sets new followed bands
+    const [followedBands, setFollowedBands] = useState([]);
+
+
+//function to handle removing a band from the followed bands list
+ const handleRemoveBand = async (id) => {
+  try {
+    const response = await fetch(`http://localhost:8080/api/customers/${customerId}/follow/${id}`, {
+      method: "DELETE"
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to unfollow band");
     }
-  };
-//function to handle profile image removal
-  const handleRemoveImage = () => {
-    setProfileData({...profileData, profileImage: null});
-  };
-//temporary hardcoded favorite bands until we connect to backend
-  const [favoriteBands, setFavoriteBands] = useState([
-    { id: 1, name: 'The Midnight Riders', genre: 'Rock', image: 'https://picsum.photos/seed/band1/200' },
-    { id: 2, name: 'Electric Souls', genre: 'Electronic', image: 'https://picsum.photos/seed/band2/200' },
-    { id: 3, name: 'Velvet Dreams', genre: 'Jazz', image: 'https://picsum.photos/seed/band3/200' },
-    { id: 4, name: 'Cosmic Waves', genre: 'Indie', image: 'https://picsum.photos/seed/band4/200' },
-  ]);
-  const [newBand, setNewBand] = useState({ name: '', genre: '' });
-//function to handle adding a new band to the favorite bands list
-  const handleAddBand = () => {
-    if (newBand.name && newBand.genre) {
-      setFavoriteBands([...favoriteBands, { 
-        id: Date.now(), 
-        name: newBand.name, 
-        genre: newBand.genre, 
-        image: `https://picsum.photos/seed/${Date.now()}/200` 
-      }]);
-      setNewBand({ name: '', genre: '' });
+
+    //remove band from followed bands state
+    setFollowedBands(followedBands.filter(band => band.id !== id));
+  } catch (error) {
+    console.error(error);
+    setMessage("Failed to unfollow band.");
+  }
+};
+
+//function to handle saving profile data to backend
+const handleSaveProfile = async () => {
+  try {
+    //PUT request to update profile
+    const profileResponse = await fetch(`http://localhost:8080/api/customers/${customerId}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        ...customer,
+        name: profileData.name,
+        location: profileData.location,
+        bio: profileData.bio,
+        profilePictureUrl: profileData.profileImage
+      })
+    });
+
+    //error handling for profile update
+    if (!profileResponse.ok) {
+      throw new Error("Failed to update profile");
     }
-  };
-//function to handle removing a band from the favorite bands list
-  const handleRemoveBand = (id) => {
-    setFavoriteBands(favoriteBands.filter(band => band.id !== id));
-  };
+
+    //receive response in json format
+    const updatedProfileCustomer = await profileResponse.json();
+
+    // PUT request to update preferred genres
+    const genresResponse = await fetch(`http://localhost:8080/api/customers/${customerId}/genres`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(selectedGenreIds)
+    });
+
+    if (!genresResponse.ok) {
+      throw new Error("Failed to update preferred genres");
+    }
+
+    // Update the customer state with the complete response including preferred genres
+    const fullyUpdatedCustomer = await genresResponse.json();
+
+    // Update state with fully updated customer data
+    setCustomer(fullyUpdatedCustomer);
+    setProfileData({
+      name: fullyUpdatedCustomer.name || '',
+      location: fullyUpdatedCustomer.location || '',
+      bio: fullyUpdatedCustomer.bio || '',
+      profileImage: fullyUpdatedCustomer.profilePictureUrl || null
+    });
+    setSelectedGenreIds(
+      (fullyUpdatedCustomer.preferredGenres || []).map((genre) => genre.genreId)
+    );
+
+    setIsEditing(false);
+    setMessage("Profile updated successfully.");
+  } catch (error) {
+    console.error(error);
+    setMessage("Failed to update profile.");
+  }
+};
 
   return (
     <div className="relative w-full min-h-screen">
@@ -70,27 +199,18 @@ export default function Profile() {
               <div className="relative">
                 <div className="w-32 h-32 rounded-full border-4 border-purple-400/40 bg-gradient-to-br from-purple-900/40 to-blue-900/40 flex items-center justify-center flex-shrink-0 overflow-hidden">
                   {profileData.profileImage ? (
-                    <img src={profileData.profileImage} alt="Profile" className="w-full h-full object-cover" />
-                  ) : (
+                        <img
+                          src={profileData.profileImage}
+                          alt="Profile"
+                          className="w-full h-full object-cover"
+                          onError={(e) => {
+                            e.target.style.display = "none";
+                          }}
+                        />                  ) : (
                     <span className="text-white text-5xl font-bold">JD</span>
                   )}
                 </div>
-                {isEditing && (
-                  <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 flex gap-2">
-                    <label className="bg-purple-600/60 hover:bg-purple-600 backdrop-blur-sm border border-purple-400/40 text-white text-xs px-3 py-1 rounded-full cursor-pointer transition-all">
-                      Upload
-                      <input type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
-                    </label>
-                    {profileData.profileImage && (
-                      <button 
-                        onClick={handleRemoveImage}
-                        className="bg-red-600/60 hover:bg-red-600 backdrop-blur-sm border border-red-400/40 text-white text-xs px-3 py-1 rounded-full transition-all"
-                      >
-                        Remove
-                      </button>
-                    )}
-                  </div>
-                )}
+                
               </div>
               
               <div className="flex-1">
@@ -105,25 +225,46 @@ export default function Profile() {
                   <h1 className="text-white font-bold text-3xl mb-2">{profileData.name}</h1>
                 )}
                 {isEditing ? (
-                  <input 
-                    type="text" 
-                    value={profileData.location}
-                    onChange={(e) => setProfileData({...profileData, location: e.target.value})}
-                    className="bg-white/10 border border-white/20 text-white/70 text-sm mb-4 px-3 py-1 rounded-lg w-full"
-                  />
-                ) : (
-                  <p className="text-white/70 text-sm mb-4">Music Enthusiast • {profileData.location}</p>
-                )}
+                    <>
+                      <input 
+                        type="text" 
+                        value={profileData.location}
+                        onChange={(e) => setProfileData({...profileData, location: e.target.value})}
+                        className="bg-white/10 border border-white/20 text-white/70 text-sm mb-2 px-3 py-1 rounded-lg w-full"
+                        placeholder="Location"
+                      />
+                      <input
+                        type="text"
+                        value={profileData.profileImage || ''}
+                        onChange={(e) => setProfileData({...profileData, profileImage: e.target.value})}
+                        className="bg-white/10 border border-white/20 text-white/70 text-sm mb-4 px-3 py-1 rounded-lg w-full"
+                        placeholder="Profile Image URL"
+                      />
+                    </>
+                  ) : (
+                    <p className="text-white/70 text-sm mb-4">Music Enthusiast • {profileData.location}</p>
+                  )}
                 {isEditing ? (
                   <div className="flex gap-2">
                     <button 
-                      onClick={() => setIsEditing(false)}
+                      onClick={handleSaveProfile}
                       className="bg-purple-600/60 hover:bg-purple-600 backdrop-blur-sm border border-purple-400/40 text-white text-sm tracking-widest uppercase px-6 py-2 rounded-full transition-all"
                     >
                       Save
                     </button>
                     <button 
-                      onClick={() => setIsEditing(false)}
+                        onClick={() => {
+                          setProfileData({
+                            name: customer.name || '',
+                            location: customer.location || '',
+                            bio: customer.bio || '',
+                            profileImage: customer.profilePictureUrl || null
+                          });
+                          setSelectedGenreIds(
+                            (customer?.preferredGenres || []).map((genre) => genre.genreId)
+                          );
+                          setIsEditing(false);
+                        }}
                       className="bg-white/10 hover:bg-white/20 backdrop-blur-sm border border-white/20 text-white text-sm tracking-widest uppercase px-6 py-2 rounded-full transition-all"
                     >
                       Cancel
@@ -155,39 +296,62 @@ export default function Profile() {
             )}
           </div>
 
+          <div className="backdrop-blur-xl bg-white/10 border border-white/20 rounded-3xl p-6 mb-6 shadow-[0_0_40px_rgba(168,85,247,0.15)]">
+  <h2 className="text-white font-bold text-xl tracking-widest uppercase mb-4">
+    Preferred Genres
+  </h2>
+
+              {isEditing ? (
+                <div className="flex flex-wrap gap-3">
+                  {allGenres.map((genre) => {
+                    const genreId = genre.genreId; // change if your JSON uses id
+                    const isSelected = selectedGenreIds.includes(genreId);
+
+                    return (
+                      <label
+                        key={genreId}
+                        className={`px-4 py-2 rounded-full border text-sm cursor-pointer transition-all ${
+                          isSelected
+                            ? "bg-purple-600/60 border-purple-400/40 text-white"
+                            : "bg-white/10 border-white/20 text-white/80"
+                        }`}
+                      >
+                        <input
+                          type="checkbox"
+                          checked={isSelected}
+                          onChange={() => handleGenreToggle(genreId)}
+                          className="hidden"
+                        />
+                        {genre.name}
+                      </label>
+                    );
+                  })}
+                </div>
+              ) : (
+                <div className="flex flex-wrap gap-3">
+                  {(customer?.preferredGenres || []).length > 0 ? (
+                    customer.preferredGenres.map((genre) => (
+                      <span
+                        key={genre.genreId}
+                        className="px-4 py-2 rounded-full bg-white/10 border border-white/20 text-white/80 text-sm"
+                      >
+                        {genre.name}
+                      </span>
+                    ))
+                  ) : (
+                    <p className="text-white/70 text-sm">No preferred genres selected.</p>
+                  )}
+                </div>
+              )}
+            </div>
+
           {/* Favorite Bands */}
           <div className="backdrop-blur-xl bg-white/10 border border-white/20 rounded-3xl p-6 shadow-[0_0_40px_rgba(168,85,247,0.15)]">
-            <h2 className="text-white font-bold text-xl tracking-widest uppercase mb-4">Favorite Bands</h2>
+            <h2 className="text-white font-bold text-xl tracking-widest uppercase mb-4">Followed Bands</h2>
             
-            {isEditing && (
-              <div className="mb-4 p-4 bg-white/5 border border-white/10 rounded-2xl">
-                <div className="flex gap-2 mb-2">
-                  <input 
-                    type="text" 
-                    placeholder="Band Name"
-                    value={newBand.name}
-                    onChange={(e) => setNewBand({...newBand, name: e.target.value})}
-                    className="flex-1 bg-white/10 border border-white/20 text-white text-sm px-3 py-2 rounded-lg placeholder-white/40"
-                  />
-                  <input 
-                    type="text" 
-                    placeholder="Genre"
-                    value={newBand.genre}
-                    onChange={(e) => setNewBand({...newBand, genre: e.target.value})}
-                    className="w-32 bg-white/10 border border-white/20 text-white text-sm px-3 py-2 rounded-lg placeholder-white/40"
-                  />
-                </div>
-                <button 
-                  onClick={handleAddBand}
-                  className="w-full bg-purple-600/60 hover:bg-purple-600 backdrop-blur-sm border border-purple-400/40 text-white text-xs tracking-widest uppercase px-4 py-2 rounded-full transition-all"
-                >
-                  Add Band
-                </button>
-              </div>
-            )}
             
             <div className="grid grid-cols-2 gap-4">
-              {favoriteBands.map(band => (
+              {followedBands.map(band => (
                 <div key={band.id} className="bg-white/5 border border-white/10 rounded-2xl p-4 hover:bg-white/10 transition-all relative">
                   {isEditing && (
                     <button 

@@ -14,11 +14,36 @@ export default function Login() {
     password: ''
   });
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    console.log('Login data:', formData);
-    window.location.reload();
-  };
+  //function to handle form submission, currently just logs data and navigates to profile
+const handleSubmit = async (e) => {
+  //prevent reloading page on form submit
+  e.preventDefault();
+
+  // Send GET request to backend to retrieve customer by email
+  try {
+    const response = await fetch(`http://localhost:8080/api/customers/email/${encodeURIComponent(formData.email)}`);
+
+    if (!response.ok) {
+      throw new Error("Customer not found");
+    }
+
+    const customer = await response.json();
+
+    console.log("Customer returned from backend:", customer);
+    console.log("Saving customerId:", customer.userId);
+
+    //store relevant customer data in local storage for later use
+    localStorage.setItem("customerId", customer.userId);
+    localStorage.setItem("customerEmail", customer.email);
+    localStorage.setItem("customerName", customer.name);
+
+    //navigate to profile on sign in
+    navigate('/profile');
+  } catch (error) {
+    console.error("Login failed:", error);
+    alert("Login failed. Please check your email.");
+  }
+};
 
   return (
     //outer layer for positioning

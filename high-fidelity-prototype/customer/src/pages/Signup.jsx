@@ -7,7 +7,11 @@ import CloudLayer from '../components/CloudLayer';
 
 //creates signup component with form state and navigation
 export default function Signup() {
+
+  //useNavigate hook for programmatic navigation after signup
   const navigate = useNavigate();
+
+  //state to hold form data for signup form
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -15,12 +19,67 @@ export default function Signup() {
     confirmPassword: '',
     location: ''
   });
-//function to handle form submission, currently just logs data and navigates to feed
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    console.log('Signup data:', formData);
-    navigate('/feed');
-  };
+
+//function to handle form submission, currently just logs data and naviga tes to feed
+const handleSubmit = async (e) => {
+  //prevent reloading page on form submit
+  e.preventDefault();
+
+  // Basic validation to check if passwords match
+  if (formData.password !== formData.confirmPassword) {
+    alert("Passwords do not match.");
+    return;
+  }
+
+  // Send POST request to backend to create new customer
+  try {
+    const response = await fetch("http://localhost:8080/api/customers", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      
+      body: JSON.stringify({
+        name: formData.name,
+        email: formData.email,
+        passwordHash: formData.password,
+        location: formData.location,
+        bio: "",
+        profilePictureUrl: "",
+        role: "CUSTOMER",
+        status: "ACTIVE"
+      })
+    });
+
+    // Check if response is ok, if not throw error
+    if (!response.ok) {
+      throw new Error("Failed to create customer");
+    }
+
+    // If response is ok, parse the new customer data from the response
+    let newCustomer = null;
+    // Check content type to ensure we can parse JSON
+    const contentType = response.headers.get("content-type");
+
+    if (contentType && contentType.includes("application/json")) {
+      newCustomer = await response.json();
+    }
+
+    // Store new customer data in localStorage for later use (ex. in profile page)
+    if (newCustomer) {
+      // Store relevant customer data in localStorage
+      localStorage.setItem("customerId", newCustomer.userId);
+      localStorage.setItem("customerEmail", newCustomer.email);
+      localStorage.setItem("customerName", newCustomer.name);
+    }
+
+    //page redirect after signing up successfully
+    navigate('/profile');
+  } catch (error) {
+    console.error("Signup failed:", error);
+    alert("Signup failed. Please try again.");
+  }
+};
 
   return (
     <div className="relative w-full min-h-screen">
