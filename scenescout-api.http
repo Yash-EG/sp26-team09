@@ -1,0 +1,284 @@
+scenescout-api.http
+@base = http://localhost:8080
+
+# ─────────────────────────────────────────
+#  BANDS  /bands
+# ─────────────────────────────────────────
+
+### [1] GET all bands
+GET {{base}}/bands
+Accept: application/json
+
+###
+
+### [2] GET band by ID
+GET {{base}}/bands/21
+Accept: application/json
+
+###
+
+### [3] GET bands by genre
+GET {{base}}/bands/genre/Rock
+Accept: application/json
+
+###
+
+### [4] POST — Create a band
+POST {{base}}/bands
+Content-Type: application/json
+
+{
+  "email": "thestrokes@example.com",
+  "passwordHash": "hashed_password_123",
+  "role": "BAND",
+  "status": "ACTIVE",
+  "name": "The Strokes",
+  "genre": "Rock",
+  "subgenre": "Indie Rock",
+  "bio": "New York-based indie rock band formed in 1998.",
+  "contactName": "Julian Casablancas",
+  "phone": "336-555-0101",
+  "setLength": 60,
+  "membersCount": 5,
+  "equipment": "Full backline provided",
+  "rate": 500.00,
+  "website": "https://thestrokes.com",
+  "instagram": "@thestrokes",
+  "spotify": "spotify:artist:thestrokes",
+  "soundcloud": "soundcloud.com/thestrokes"
+}
+
+###
+
+### [5] PUT — Update a band
+PUT {{base}}/bands/28
+Content-Type: application/json
+
+{
+  "email": "thestrokes@example.com",
+  "passwordHash": "hashed_password_123",
+  "role": "BAND",
+  "status": "ACTIVE",
+  "name": "The Strokes (Updated)",
+  "genre": "Rock",
+  "subgenre": "Indie Rock",
+  "bio": "Updated bio for The Strokes.",
+  "contactName": "Julian Casablancas",
+  "phone": "336-555-0101",
+  "setLength": 75,
+  "membersCount": 5,
+  "equipment": "Full backline provided",
+  "rate": 600.00,
+  "website": "https://thestrokes.com",
+  "instagram": "@thestrokes",
+  "spotify": "spotify:artist:thestrokes",
+  "soundcloud": "soundcloud.com/thestrokes"
+}
+
+###
+
+### [6] DELETE — Delete a band
+DELETE {{base}}/bands/28
+
+###
+
+
+# ─────────────────────────────────────────
+#  SHOWS  /shows
+# ─────────────────────────────────────────
+
+### [7] GET all shows
+GET {{base}}/shows
+Accept: application/json
+
+###
+
+### [8] GET show by ID
+GET {{base}}/shows/2
+Accept: application/json
+
+###
+
+### [9] GET shows by band ID
+GET {{base}}/shows/band/10
+Accept: application/json
+
+###
+
+### [10] GET shows by genre
+GET {{base}}/shows/genre/Rock
+Accept: application/json
+
+###
+
+### [11] POST — Create a show (band.userId must exist)
+POST {{base}}/shows
+Content-Type: application/json
+
+{
+  "band": { "userId": 21 },
+  "ticketPrice": 15.00,
+  "image": "https://example.com/show-flyer.jpg",
+  "description": "An electrifying night of indie rock in Greensboro.",
+  "location": "Greensboro, NC",
+  "venueAddress": "200 N Elm St, Greensboro, NC 27401",
+  "date": "2026-04-15",
+  "doorsTime": "19:00:00",
+  "showTime": "20:00:00",
+  "genre": "Rock",
+  "ageRestriction": "18+",
+  "lineup": "Artic Monkey, Local Opener",
+  "showStatus": "UPCOMING"
+}
+
+###
+
+### [12] PUT — Update a show
+PUT {{base}}/shows/6
+Content-Type: application/json
+
+{
+  "band": { "userId": 1 },
+  "ticketPrice": 20.00,
+  "image": "https://example.com/show-flyer-updated.jpg",
+  "description": "Updated show description.",
+  "location": "Greensboro, NC",
+  "venueAddress": "200 N Elm St, Greensboro, NC 27401",
+  "date": "2026-04-15",
+  "doorsTime": "18:30:00",
+  "showTime": "20:00:00",
+  "genre": "Rock",
+  "ageRestriction": "All Ages",
+  "lineup": "The Strokes, Opener 1, Opener 2",
+  "showStatus": "UPCOMING"
+}
+
+###
+
+### [13] DELETE — Delete a show
+DELETE {{base}}/shows/6
+
+###
+
+
+# ─────────────────────────────────────────
+#  CUSTOMERS  /api/customers
+# ─────────────────────────────────────────
+
+### [14] GET all customers
+GET {{base}}/api/customers
+Accept: application/json
+
+###
+
+### [15] GET customer by ID
+GET {{base}}/api/customers/9
+Accept: application/json
+
+###
+
+### [16] GET customer by email
+GET {{base}}/api/customers/email/jane@example.com
+Accept: application/json
+
+###
+
+### [17] GET bands followed by a customer
+GET {{base}}/api/customers/9/following
+Accept: application/json
+
+###
+
+### [18] GET shows a customer is interested in
+GET {{base}}/api/customers/9/interested
+Accept: application/json
+
+###
+
+### [19] POST — Create a customer
+POST {{base}}/api/customers
+Content-Type: application/json
+
+{
+  "email": "jane2@example.com",
+  "passwordHash": "hashed_password_456",
+  "role": "AUDIENCE",
+  "status": "ACTIVE",
+  "name": "Jane Doe",
+  "bio": "Local music fan in Greensboro.",
+  "profilePictureUrl": "https://example.com/jane.jpg",
+  "location": "Greensboro, NC"
+}
+
+###
+
+### [20] POST — Follow a band (customer 1 follows band 1)
+POST {{base}}/api/customers/9/follow/21
+
+###
+
+### [21] POST — Mark a show as interested (customer 1, show 1)
+POST {{base}}/api/customers/9/interested/4
+
+###
+
+### [22] PUT — Update customer profile
+PUT {{base}}/api/customers/9
+Content-Type: application/json
+
+{
+  "email": "jane@example.com",
+  "passwordHash": "hashed_password_456",
+  "role": "AUDIENCE",
+  "status": "ACTIVE",
+  "name": "Jane Doe (Updated)",
+  "bio": "Updated bio.",
+  "profilePictureUrl": "https://example.com/jane-new.jpg",
+  "location": "Burlington, NC"
+}
+
+###
+
+### [23] PUT — Update customer preferred genres (pass list of Genre IDs)
+PUT {{base}}/api/customers/9/genres
+Content-Type: application/json
+
+[1, 2, 3]
+
+###
+
+### [24] DELETE — Unfollow a band (customer 1 unfollows band 1)
+DELETE {{base}}/api/customers/9/follow/21
+
+###
+
+### [25] DELETE — Unmark show as interested (customer 1, show 1)
+DELETE {{base}}/api/customers/9/interested/2
+
+###
+
+### [26] DELETE — Delete customer
+DELETE {{base}}/api/customers/29
+
+###
+
+
+# ─────────────────────────────────────────
+#  GENRES  /api/genres
+# ─────────────────────────────────────────
+
+### [27] GET all genres
+GET {{base}}/api/genres
+Accept: application/json
+
+###
+
+### [28] POST — Create a genre
+POST {{base}}/api/genres
+Content-Type: application/json
+
+{
+  "name": "Death Metal"
+}
+
+###
