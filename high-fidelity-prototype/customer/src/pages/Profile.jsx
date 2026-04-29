@@ -113,7 +113,7 @@ useEffect(() => {
     }
 
     //remove band from followed bands state
-    setFollowedBands(followedBands.filter(band => band.id !== id));
+    setFollowedBands(followedBands.filter(band => band.userId !== id));
   } catch (error) {
     console.error(error);
     setMessage("Failed to unfollow band.");
@@ -352,23 +352,21 @@ const handleSaveProfile = async () => {
             
             <div className="grid grid-cols-2 gap-4">
               {followedBands.map(band => (
-                <div key={band.id} className="bg-white/5 border border-white/10 rounded-2xl p-4 hover:bg-white/10 transition-all relative">
-                  {isEditing && (
-                    <button 
-                      onClick={() => handleRemoveBand(band.id)}
-                      className="absolute -top-2 -right-2 bg-red-600/60 hover:bg-red-600 backdrop-blur-sm border border-red-400/40 text-white w-6 h-6 rounded-full transition-all flex items-center justify-center text-xs"
-                    >
-                      ×
-                    </button>
-                  )}
+                <div key={band.userId} className="bg-white/5 border border-white/10 rounded-2xl p-4 hover:bg-white/10 transition-all relative">
                   <div className="flex items-center gap-4">
-                    <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-purple-400/40 flex-shrink-0">
-                      <img src={band.image} alt={band.name} className="w-full h-full object-cover" />
+                    <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-purple-400/40 flex-shrink-0 bg-white/10 flex items-center justify-center">
+                      <span className="text-white text-xl font-bold">{band.name?.[0]}</span>
                     </div>
                     <div className="flex-1 min-w-0">
                       <h3 className="text-white font-bold text-sm truncate">{band.name}</h3>
                       <p className="text-purple-400 text-xs uppercase tracking-wide">{band.genre}</p>
                     </div>
+                    <button
+                      onClick={() => handleRemoveBand(band.userId)}
+                      className="bg-red-600/60 hover:bg-red-600 backdrop-blur-sm border border-red-400/40 text-white text-xs tracking-widest uppercase px-3 py-1 rounded-full transition-all flex-shrink-0"
+                    >
+                      Unfollow
+                    </button>
                   </div>
                 </div>
               ))}

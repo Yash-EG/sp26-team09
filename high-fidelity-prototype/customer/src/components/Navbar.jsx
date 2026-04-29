@@ -1,21 +1,27 @@
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import SearchBar from './SearchBar'
 
 
 export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false)
   const [searchOpen, setSearchOpen] = useState(false)
+  const navigate = useNavigate()
+  const customerId = localStorage.getItem('customerId')
 
-  const links = [
+  const handleLogout = () => {
+    localStorage.removeItem('customerId')
+    navigate('/login')
+  }
+
+  const links = customerId ? [
     { name: 'Feed', path: '/feed' },
     { name: 'My Shows', path: '/bookings' },
     { name: 'Profile', path: '/profile' },
-  ]
+  ] : []
 
   return (
     <div>
-      {/* --- TOP BAR (Logo + Links) --- */}
       <div className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between pointer-events-none">
 
         {/* Left pill - Logo + Search */}
@@ -50,6 +56,18 @@ export default function Navbar() {
               {link.name}
             </Link>
           ))}
+          {customerId ? (
+            <button
+              onClick={handleLogout}
+              className="text-xl tracking-widest uppercase text-gray-300 hover:text-red-400 transition-colors"
+            >
+              Logout
+            </button>
+          ) : (
+            <Link to="/login" className="text-xl tracking-widest uppercase text-gray-300 hover:text-white transition-colors">
+              Login
+            </Link>
+          )}
         </div>
 
         {/* Right pill - Waffle button (mobile) */}
@@ -84,11 +102,23 @@ export default function Navbar() {
                 key={link.name}
                 to={link.path}
                 onClick={() => setMenuOpen(false)}
-                className="text-xl tracking-widest uppercase text-gray-300 hover:text-white transition-colors"
+                className="text-xl tracking-widests uppercase text-gray-300 hover:text-white transition-colors"
               >
                 {link.name}
               </Link>
             ))}
+            {customerId ? (
+              <button
+                onClick={() => { setMenuOpen(false); handleLogout(); }}
+                className="text-xl tracking-widest uppercase text-gray-300 hover:text-red-400 transition-colors"
+              >
+                Logout
+              </button>
+            ) : (
+              <Link to="/login" onClick={() => setMenuOpen(false)} className="text-xl tracking-widest uppercase text-gray-300 hover:text-white transition-colors">
+                Login
+              </Link>
+            )}
           </div>
         </div>
       )}
