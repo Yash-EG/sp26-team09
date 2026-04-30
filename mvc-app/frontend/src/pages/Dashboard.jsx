@@ -78,7 +78,7 @@ export default function Dashboard() {
   const nextShow = shows[0] ?? null
 
   return (
-    <div className="relative min-h-screen" style={{ background: '#08080f' }}>
+    <div className="relative min-h-screen" style={{ background: 'var(--page-bg)' }}>
       <CloudLayer />
 
       <div className="relative z-20">
@@ -86,7 +86,7 @@ export default function Dashboard() {
 
         <div className="max-w-5xl mx-auto px-4 pt-28 pb-28 space-y-6">
 
-          <div className="backdrop-blur-xl bg-white/10 border border-white/20 rounded-3xl p-8 relative overflow-hidden shadow-[0_0_60px_rgba(168,85,247,0.12)]">
+          <div className="backdrop-blur-xl bg-white/70 dark:bg-white/10 border border-black/[0.08] dark:border-white/20 rounded-3xl p-8 relative overflow-hidden shadow-[0_0_60px_rgba(168,85,247,0.12)]">
             <div className="absolute -top-16 -right-16 w-64 h-64 bg-purple-600/20 rounded-full blur-3xl pointer-events-none" />
 
             <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6">
@@ -98,12 +98,12 @@ export default function Dashboard() {
               </div>
 
               <div className="flex-1 text-center sm:text-left">
-                <h1 className="text-white font-black text-3xl tracking-widest uppercase">
+                <h1 className="text-gray-900 dark:text-white font-black text-3xl tracking-widest uppercase">
                   {band?.name ?? localStorage.getItem('bandName') ?? 'Your Band'}
                 </h1>
                 <div className="flex items-center justify-center sm:justify-start gap-3 mt-2">
                   {band?.genre && (
-                    <span className="bg-purple-600/40 border border-purple-400/30 text-purple-300 text-xs tracking-widest uppercase px-3 py-1 rounded-full">
+                    <span className="bg-purple-600/40 border border-purple-400/30 text-purple-600 dark:text-purple-300 text-xs tracking-widest uppercase px-3 py-1 rounded-full">
                       {band.genre}
                     </span>
                   )}
@@ -115,27 +115,27 @@ export default function Dashboard() {
                   { label: 'Shows', value: shows.length },
                 ].map(({ label, value }) => (
                   <div key={label}>
-                    <div className="text-white font-black text-2xl">{value}</div>
-                    <div className="text-white/40 text-xs tracking-widest uppercase">{label}</div>
+                    <div className="text-gray-900 dark:text-white font-black text-2xl">{value}</div>
+                    <div className="text-gray-400 dark:text-white/40 text-xs tracking-widest uppercase">{label}</div>
                   </div>
                 ))}
               </div>
             </div>
           </div>
 
-          <div className="backdrop-blur-xl bg-purple-950/30 border border-purple-400/40 rounded-3xl relative overflow-hidden shadow-[0_0_50px_rgba(168,85,247,0.18)]">
+          <div className="backdrop-blur-xl bg-purple-50 dark:bg-purple-950/30 border border-purple-200 dark:border-purple-400/40 rounded-3xl relative overflow-hidden shadow-[0_0_50px_rgba(168,85,247,0.18)]">
             <div className="absolute -top-10 -right-10 w-48 h-48 bg-purple-600/25 rounded-full blur-3xl pointer-events-none" />
 
             {nextShow ? (
               <div className="p-6">
                 <div className="flex items-start justify-between gap-4 mb-5">
                   <div>
-                    <p className="text-purple-400 text-xs tracking-widest uppercase font-bold mb-1">Next Show</p>
-                    <h2 className="text-white font-black text-xl tracking-widest uppercase">{nextShow.location}</h2>
+                    <p className="text-purple-500 dark:text-purple-400 text-xs tracking-widest uppercase font-bold mb-1">Next Show</p>
+                    <h2 className="text-gray-900 dark:text-white font-black text-xl tracking-widest uppercase">{nextShow.location}</h2>
                   </div>
                   <div className="text-right flex-shrink-0">
-                    <div className="text-white font-black text-3xl leading-none">{daysUntil(nextShow.date)}</div>
-                    <div className="text-white/40 text-xs tracking-widest uppercase">
+                    <div className="text-gray-900 dark:text-white font-black text-3xl leading-none">{daysUntil(nextShow.date)}</div>
+                    <div className="text-gray-400 dark:text-white/40 text-xs tracking-widest uppercase">
                       {daysUntil(nextShow.date) === 1 ? 'day away' : 'days away'}
                     </div>
                   </div>
@@ -148,9 +148,9 @@ export default function Dashboard() {
                     { label: 'Tickets', value: nextShow.ticketPrice != null ? `$${nextShow.ticketPrice}` : 'TBA' },
                     { label: 'Genre', value: nextShow.genre ?? '—' },
                   ].map(({ label, value }) => (
-                    <div key={label} className="bg-white/5 rounded-xl px-3 py-2.5">
-                      <div className="text-white/40 text-xs tracking-widest uppercase mb-1">{label}</div>
-                      <div className="text-white text-sm font-semibold">{value}</div>
+                    <div key={label} className="bg-black/5 dark:bg-white/5 rounded-xl px-3 py-2.5">
+                      <div className="text-gray-400 dark:text-white/40 text-xs tracking-widest uppercase mb-1">{label}</div>
+                      <div className="text-gray-900 dark:text-white text-sm font-semibold">{value}</div>
                     </div>
                   ))}
                 </div>
@@ -166,8 +166,8 @@ export default function Dashboard() {
               </div>
             ) : (
               <div className="p-8 text-center">
-                <p className="text-purple-400 text-xs tracking-widest uppercase font-bold mb-2">Next Show</p>
-                <p className="text-white/40 text-sm mb-4">No upcoming shows yet</p>
+                <p className="text-purple-500 dark:text-purple-400 text-xs tracking-widest uppercase font-bold mb-2">Next Show</p>
+                <p className="text-gray-400 dark:text-white/40 text-sm mb-4">No upcoming shows yet</p>
                 <Link
                   to="/feed"
                   className="bg-purple-600/60 hover:bg-purple-600 border border-purple-400/40 text-white text-xs tracking-widest uppercase px-5 py-2.5 rounded-full transition-all"
@@ -178,12 +178,10 @@ export default function Dashboard() {
             )}
           </div>
 
-          {/* ── Bottom two-column grid ── */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
-            {/* Quick actions */}
-            <div className="backdrop-blur-xl bg-white/10 border border-white/20 rounded-3xl p-6 shadow-[0_0_40px_rgba(168,85,247,0.08)]">
-              <h3 className="text-white font-bold text-sm tracking-widest uppercase mb-4 pb-3 border-b border-white/10">
+            <div className="backdrop-blur-xl bg-white/70 dark:bg-white/10 border border-black/[0.08] dark:border-white/20 rounded-3xl p-6 shadow-[0_0_40px_rgba(168,85,247,0.08)]">
+              <h3 className="text-gray-900 dark:text-white font-bold text-sm tracking-widest uppercase mb-4 pb-3 border-b border-black/[0.06] dark:border-white/10">
                 Quick Actions
               </h3>
               <div className="space-y-2">
@@ -191,7 +189,7 @@ export default function Dashboard() {
                   <Link
                     key={action.label}
                     to={action.to}
-                    className="flex items-center gap-4 p-3 rounded-xl hover:bg-white/5 transition-colors group"
+                    className="flex items-center gap-4 p-3 rounded-xl hover:bg-black/5 dark:hover:bg-white/5 transition-colors group"
                   >
                     <div className="w-9 h-9 rounded-xl bg-purple-600/20 border border-purple-400/20 flex items-center justify-center flex-shrink-0 group-hover:bg-purple-600/30 transition-colors">
                       <svg className="w-4 h-4 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -199,10 +197,10 @@ export default function Dashboard() {
                       </svg>
                     </div>
                     <div>
-                      <div className="text-white text-sm font-semibold tracking-wide">{action.label}</div>
-                      <div className="text-white/40 text-xs">{action.description}</div>
+                      <div className="text-gray-900 dark:text-white text-sm font-semibold tracking-wide">{action.label}</div>
+                      <div className="text-gray-400 dark:text-white/40 text-xs">{action.description}</div>
                     </div>
-                    <svg className="w-4 h-4 text-white/20 group-hover:text-white/50 ml-auto transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-4 h-4 text-gray-300 dark:text-white/20 group-hover:text-gray-500 dark:group-hover:text-white/50 ml-auto transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                     </svg>
                   </Link>
@@ -210,8 +208,8 @@ export default function Dashboard() {
               </div>
             </div>
 
-            <div className="backdrop-blur-xl bg-white/10 border border-white/20 rounded-3xl p-6 shadow-[0_0_40px_rgba(168,85,247,0.08)]">
-              <h3 className="text-white font-bold text-sm tracking-widest uppercase mb-4 pb-3 border-b border-white/10">
+            <div className="backdrop-blur-xl bg-white/70 dark:bg-white/10 border border-black/[0.08] dark:border-white/20 rounded-3xl p-6 shadow-[0_0_40px_rgba(168,85,247,0.08)]">
+              <h3 className="text-gray-900 dark:text-white font-bold text-sm tracking-widest uppercase mb-4 pb-3 border-b border-black/[0.06] dark:border-white/10">
                 Recent Activity
               </h3>
               <div className="space-y-4">
@@ -221,8 +219,8 @@ export default function Dashboard() {
                       <ActivityIcon type={item.icon} />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-white/70 text-sm leading-snug">{item.text}</p>
-                      <p className="text-white/30 text-xs mt-0.5 tracking-widest uppercase">{item.time}</p>
+                      <p className="text-gray-600 dark:text-white/70 text-sm leading-snug">{item.text}</p>
+                      <p className="text-gray-400 dark:text-white/30 text-xs mt-0.5 tracking-widest uppercase">{item.time}</p>
                     </div>
                   </div>
                 ))}

@@ -1,7 +1,9 @@
 import { useState, useRef, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import CloudLayer from '../components/CloudLayer'
 import Navbar from '../components/Navbar'
-import { getBandById, updateBand } from '../api'
+import CustomSelect from '../components/CustomSelect'
+import { getBandById, updateBand, deleteBand } from '../api'
 
 const genres = [
   'Rock', 'Jazz', 'Hip-Hop', 'R&B', 'Country',
@@ -10,14 +12,14 @@ const genres = [
 ]
 
 const inputClass =
-  'w-full bg-white/10 border border-white/20 text-white px-4 py-3 rounded-lg focus:outline-none focus:border-purple-400/40 placeholder-white/40 transition-colors'
+  'w-full bg-white/80 dark:bg-white/10 border border-gray-200 dark:border-white/20 text-gray-900 dark:text-white px-4 py-3 rounded-lg focus:outline-none focus:border-purple-400 dark:focus:border-purple-400/40 placeholder-gray-400 dark:placeholder-white/40 transition-colors'
 
-const labelClass = 'text-white/80 text-sm font-bold mb-2 block tracking-wide'
+const labelClass = 'text-gray-700 dark:text-white/80 text-sm font-bold mb-2 block tracking-wide'
 
 function Section({ title, children }) {
   return (
-    <div className="backdrop-blur-xl bg-white/10 border border-white/20 rounded-3xl p-6 shadow-[0_0_40px_rgba(168,85,247,0.08)]">
-      <h2 className="text-white font-bold text-sm tracking-widest uppercase mb-5 pb-3 border-b border-white/10">
+    <div className="backdrop-blur-xl bg-white/70 dark:bg-white/10 border border-black/[0.08] dark:border-white/20 rounded-3xl p-6 shadow-[0_0_40px_rgba(168,85,247,0.08)]">
+      <h2 className="text-gray-900 dark:text-white font-bold text-sm tracking-widest uppercase mb-5 pb-3 border-b border-black/[0.06] dark:border-white/10">
         {title}
       </h2>
       {children}
@@ -27,10 +29,12 @@ function Section({ title, children }) {
 
 export default function Profile() {
   const fileInputRef = useRef(null)
+  const navigate = useNavigate()
 
   const [saved, setSaved] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
+  const [confirmDelete, setConfirmDelete] = useState(false)
   const [avatarPreview, setAvatarPreview] = useState(null)
 
   const [profile, setProfile] = useState({
@@ -108,8 +112,21 @@ export default function Profile() {
     }
   }
 
+  async function handleDeleteAccount() {
+    const id = localStorage.getItem('bandId')
+    if (!id) return
+    try {
+      await deleteBand(id)
+      localStorage.removeItem('bandId')
+      localStorage.removeItem('bandName')
+      navigate('/')
+    } catch (err) {
+      setError(err.message)
+    }
+  }
+
   return (
-    <div className="relative min-h-screen" style={{ background: '#08080f' }}>
+    <div className="relative min-h-screen" style={{ background: 'var(--page-bg)' }}>
 
       {/* Background layer */}
       <CloudLayer />
@@ -121,7 +138,7 @@ export default function Profile() {
         <div className="max-w-3xl mx-auto px-4 pt-28 pb-28">
 
           {/* ── Profile Header Card ── */}
-          <div className="backdrop-blur-xl bg-white/10 border border-white/20 rounded-3xl p-8 mb-6 shadow-[0_0_40px_rgba(168,85,247,0.12)] relative overflow-hidden">
+          <div className="backdrop-blur-xl bg-white/70 dark:bg-white/10 border border-black/[0.08] dark:border-white/20 rounded-3xl p-8 mb-6 shadow-[0_0_40px_rgba(168,85,247,0.12)] relative overflow-hidden">
 
             {/* Glow accent */}
             <div className="absolute -top-16 -right-16 w-56 h-56 bg-purple-600/20 rounded-full blur-3xl pointer-events-none" />
@@ -165,7 +182,7 @@ export default function Profile() {
 
               {/* Band name + badge */}
               <div className="flex-1 text-center sm:text-left">
-                <h1 className="text-white font-black text-3xl tracking-widest uppercase leading-tight">
+                <h1 className="text-gray-900 dark:text-white font-black text-3xl tracking-widest uppercase leading-tight">
                   {profile.bandName || 'Your Band'}
                 </h1>
                 <div className="flex items-center justify-center sm:justify-start gap-3 mt-2">
@@ -174,7 +191,7 @@ export default function Profile() {
                   </span>
                   <span className="text-white/40 text-sm">{profile.location}</span>
                 </div>
-                <p className="text-white/50 text-sm mt-3 leading-relaxed line-clamp-2">
+                <p className="text-gray-500 dark:text-white/50 text-sm mt-3 leading-relaxed line-clamp-2">
                   {profile.bio || 'No bio yet — add one below.'}
                 </p>
               </div>
@@ -209,15 +226,12 @@ export default function Profile() {
                 </div>
                 <div>
                   <label className={labelClass}>Genre</label>
-                  <select
+                  <CustomSelect
                     value={profile.genre}
                     onChange={handleChange('genre')}
-                    className={`${inputClass} appearance-none`}
-                  >
-                    {genres.map((g) => (
-                      <option key={g} value={g} className="bg-gray-900">{g}</option>
-                    ))}
-                  </select>
+                    options={genres}
+                    className={inputClass}
+                  />
                 </div>
                 <div>
                   <label className={labelClass}>Sub-genre / Style</label>
@@ -355,11 +369,11 @@ export default function Profile() {
             {/* Save Button */}
             <div className="flex flex-col items-end gap-3 pt-2">
               {error && (
-                <p className="text-red-400 text-sm tracking-wide">{error}</p>
+                <p className="text-red-500 text-sm tracking-wide">{error}</p>
               )}
               <div className="flex items-center gap-4">
                 {saved && (
-                  <span className="text-green-400 text-sm tracking-widest uppercase flex items-center gap-2">
+                  <span className="text-green-500 dark:text-green-400 text-sm tracking-widest uppercase flex items-center gap-2">
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                     </svg>
@@ -374,6 +388,40 @@ export default function Profile() {
                   {loading ? 'Saving…' : 'Save Profile'}
                 </button>
               </div>
+            </div>
+
+            {/* Danger Zone */}
+            <div className="backdrop-blur-xl bg-red-950/20 border border-red-400/20 rounded-3xl p-6">
+              <h2 className="text-red-400 font-bold text-sm tracking-widest uppercase mb-3">Danger Zone</h2>
+              {!confirmDelete ? (
+                <button
+                  type="button"
+                  onClick={() => setConfirmDelete(true)}
+                  className="bg-red-600/20 hover:bg-red-600/30 border border-red-400/30 text-red-400 text-sm tracking-widest uppercase px-6 py-2.5 rounded-full transition-all"
+                >
+                  Delete Account
+                </button>
+              ) : (
+                <div className="flex items-center gap-4 flex-wrap">
+                  <p className="text-white/60 text-sm">This will permanently delete your account and all shows.</p>
+                  <div className="flex gap-3">
+                    <button
+                      type="button"
+                      onClick={() => setConfirmDelete(false)}
+                      className="text-white/50 hover:text-white text-sm tracking-widest uppercase transition-colors px-4 py-2"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleDeleteAccount}
+                      className="bg-red-600/60 hover:bg-red-600 border border-red-400/40 text-white text-sm tracking-widest uppercase px-6 py-2.5 rounded-full transition-all"
+                    >
+                      Yes, Delete
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
 
           </form>

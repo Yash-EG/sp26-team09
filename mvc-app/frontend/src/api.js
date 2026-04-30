@@ -32,3 +32,16 @@ export const updateShow = (id, data) =>
 
 export const deleteShow = (id) =>
   request(`/shows/${id}`, { method: 'DELETE' })
+
+export const deleteBand = (id) =>
+  request(`/bands/${id}`, { method: 'DELETE' })
+
+export const getAllPosts = () => request('/posts')
+
+export const getPostsByBand = (bandId) => request(`/posts/band/${bandId}`)
+
+export const createPost = (data) =>
+  request('/posts', { method: 'POST', body: JSON.stringify(data) })
+
+export const deletePost = (id) =>
+  request(`/posts/${id}`, { method: 'DELETE' })

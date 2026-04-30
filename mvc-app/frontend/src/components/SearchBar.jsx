@@ -1,10 +1,15 @@
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 
 export default function SearchBar({ onClose }) {
   const [query, setQuery] = useState('')
+  const navigate = useNavigate()
 
   const handleSubmit = (e) => {
     e.preventDefault()
+    if (!query.trim()) return
+    navigate(`/feed?q=${encodeURIComponent(query.trim())}`)
+    onClose()
   }
 
   return (
@@ -28,7 +33,7 @@ export default function SearchBar({ onClose }) {
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Search venues, artists..."
-          className="bg-white/10 border border-white/20 text-white text-sm pl-10 pr-8 py-2 rounded-full w-56 focus:outline-none focus:border-purple-400/40 placeholder-gray-400 transition-all"
+          className="bg-white/80 dark:bg-white/10 border border-gray-200 dark:border-white/20 text-gray-900 dark:text-white text-sm pl-10 pr-8 py-2 rounded-full w-56 focus:outline-none focus:border-purple-400 dark:focus:border-purple-400/40 placeholder-gray-400 transition-all"
           autoFocus
         />
         <button

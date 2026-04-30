@@ -1,12 +1,14 @@
 import { useState, useRef, useEffect } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import CloudLayer from '../components/CloudLayer'
 import Navbar from '../components/Navbar'
+import CustomSelect from '../components/CustomSelect'
 import { getAllShows, createShow, updateShow, deleteShow } from '../api'
 
 const inputClass =
-  'w-full bg-white/10 border border-white/20 text-white px-4 py-3 rounded-lg focus:outline-none focus:border-purple-400/40 placeholder-white/40 transition-colors'
+  'w-full bg-white/80 dark:bg-white/10 border border-gray-200 dark:border-white/20 text-gray-900 dark:text-white px-4 py-3 rounded-lg focus:outline-none focus:border-purple-400 dark:focus:border-purple-400/40 placeholder-gray-400 dark:placeholder-white/40 transition-colors'
 
-const labelClass = 'text-white/80 text-sm font-bold mb-2 block tracking-wide'
+const labelClass = 'text-gray-700 dark:text-white/80 text-sm font-bold mb-2 block tracking-wide'
 
 const genres = [
   'Rock', 'Jazz', 'Hip-Hop', 'R&B', 'Country',
@@ -32,6 +34,7 @@ function showToPost(show) {
     imageUrl:       show.image                                           ?? '',
     ticketUrl:      show.ticketUrl                                       ?? '',
     posterUrl:      show.image                                           ?? null,
+    showStatus:     show.showStatus                                       ?? 'UPCOMING',
     postedAt:       new Date().toISOString(),
     likes:          0,
     interested:     0,
@@ -58,14 +61,17 @@ function formatTime(timeStr) {
   return `${hour}:${m.toString().padStart(2, '0')} ${ampm}`
 }
 
-function ConcertCard({ post, onDelete, onEdit, isOwn }) {
+function ConcertCard({ post, onDelete, onEdit, onCancel, isOwn }) {
   const [expanded, setExpanded] = useState(false)
+  const isCancelled = post.showStatus === 'CANCELLED'
 
   return (
     <div className={`backdrop-blur-xl border rounded-3xl overflow-hidden relative ${
-      isOwn
-        ? 'bg-purple-950/30 border-purple-400/50 shadow-[0_0_50px_rgba(168,85,247,0.20)]'
-        : 'bg-white/10 border-white/20 shadow-[0_0_40px_rgba(168,85,247,0.08)]'
+      isCancelled
+        ? 'bg-gray-50 dark:bg-white/5 border-gray-200 dark:border-white/10 opacity-70'
+        : isOwn
+          ? 'bg-purple-50 dark:bg-purple-950/30 border-purple-200 dark:border-purple-400/50 shadow-[0_0_50px_rgba(168,85,247,0.20)]'
+          : 'bg-white/70 dark:bg-white/10 border-black/[0.08] dark:border-white/20 shadow-[0_0_40px_rgba(168,85,247,0.08)]'
     }`}>
       <div className={`absolute -top-10 -right-10 w-40 h-40 rounded-full blur-3xl pointer-events-none z-0 ${
         isOwn ? 'bg-purple-600/30' : 'bg-purple-600/15'
@@ -81,12 +87,17 @@ function ConcertCard({ post, onDelete, onEdit, isOwn }) {
         <div className="flex items-start justify-between gap-4 mb-4">
           <div>
             <div className="flex items-center gap-2">
-              <h3 className="text-white font-black text-lg tracking-widest uppercase leading-tight">
+              <h3 className="text-gray-900 dark:text-white font-black text-lg tracking-widest uppercase leading-tight">
                 {post.bandName}
               </h3>
-              {isOwn && (
+              {isOwn && !isCancelled && (
                 <span className="bg-purple-500/30 border border-purple-400/60 text-purple-300 text-xs tracking-widest uppercase px-2 py-0.5 rounded-full">
                   Your Show
+                </span>
+              )}
+              {isCancelled && (
+                <span className="bg-red-500/20 border border-red-400/40 text-red-400 text-xs tracking-widest uppercase px-2 py-0.5 rounded-full">
+                  Cancelled
                 </span>
               )}
             </div>
@@ -124,51 +135,51 @@ function ConcertCard({ post, onDelete, onEdit, isOwn }) {
               value: post.ticketPrice,
             },
           ].map(({ icon, label, value, sub }) => (
-            <div key={label} className="bg-white/5 rounded-xl px-3 py-2.5">
+            <div key={label} className="bg-black/5 dark:bg-white/5 rounded-xl px-3 py-2.5">
               <div className="flex items-center gap-1.5 mb-1">
                 <svg className="w-3.5 h-3.5 text-purple-400/70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d={icon} />
                 </svg>
-                <span className="text-white/40 text-xs tracking-widest uppercase">{label}</span>
+                <span className="text-gray-400 dark:text-white/40 text-xs tracking-widest uppercase">{label}</span>
               </div>
-              <span className="text-white text-sm font-semibold">{value}</span>
-              {sub && <p className="text-white/40 text-xs mt-0.5 leading-snug">{sub}</p>}
+              <span className="text-gray-900 dark:text-white text-sm font-semibold">{value}</span>
+              {sub && <p className="text-gray-400 dark:text-white/40 text-xs mt-0.5 leading-snug">{sub}</p>}
             </div>
           ))}
         </div>
 
         {post.description && (
-          <p className="text-white/60 text-sm leading-relaxed mt-1">{post.description}</p>
+          <p className="text-gray-600 dark:text-white/60 text-sm leading-relaxed mt-1">{post.description}</p>
         )}
 
         {/* Expanded details */}
         {expanded && (
-          <div className="mt-4 space-y-3 border-t border-white/10 pt-4">
+          <div className="mt-4 space-y-3 border-t border-black/[0.06] dark:border-white/10 pt-4">
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
               {post.doorsTime && (
-                <div className="bg-white/5 rounded-xl px-3 py-2.5">
-                  <div className="text-white/40 text-xs tracking-widest uppercase mb-1">Doors</div>
-                  <div className="text-white text-sm font-semibold">{formatTime(post.doorsTime)}</div>
+                <div className="bg-black/5 dark:bg-white/5 rounded-xl px-3 py-2.5">
+                  <div className="text-gray-400 dark:text-white/40 text-xs tracking-widest uppercase mb-1">Doors</div>
+                  <div className="text-gray-900 dark:text-white text-sm font-semibold">{formatTime(post.doorsTime)}</div>
                 </div>
               )}
               {post.ageRestriction && (
-                <div className="bg-white/5 rounded-xl px-3 py-2.5">
-                  <div className="text-white/40 text-xs tracking-widest uppercase mb-1">Age</div>
-                  <div className="text-white text-sm font-semibold">{post.ageRestriction}</div>
+                <div className="bg-black/5 dark:bg-white/5 rounded-xl px-3 py-2.5">
+                  <div className="text-gray-400 dark:text-white/40 text-xs tracking-widest uppercase mb-1">Age</div>
+                  <div className="text-gray-900 dark:text-white text-sm font-semibold">{post.ageRestriction}</div>
                 </div>
               )}
               {post.address && (
-                <div className="bg-white/5 rounded-xl px-3 py-2.5">
-                  <div className="text-white/40 text-xs tracking-widest uppercase mb-1">Address</div>
-                  <div className="text-white text-sm font-semibold leading-snug">{post.address}</div>
+                <div className="bg-black/5 dark:bg-white/5 rounded-xl px-3 py-2.5">
+                  <div className="text-gray-400 dark:text-white/40 text-xs tracking-widest uppercase mb-1">Address</div>
+                  <div className="text-gray-900 dark:text-white text-sm font-semibold leading-snug">{post.address}</div>
                 </div>
               )}
             </div>
 
             {post.lineup && (
-              <div className="bg-white/5 rounded-xl px-3 py-2.5">
-                <div className="text-white/40 text-xs tracking-widest uppercase mb-1">Lineup</div>
-                <div className="text-white text-sm font-semibold">{post.lineup}</div>
+              <div className="bg-black/5 dark:bg-white/5 rounded-xl px-3 py-2.5">
+                <div className="text-gray-400 dark:text-white/40 text-xs tracking-widest uppercase mb-1">Lineup</div>
+                <div className="text-gray-900 dark:text-white text-sm font-semibold">{post.lineup}</div>
               </div>
             )}
 
@@ -189,10 +200,10 @@ function ConcertCard({ post, onDelete, onEdit, isOwn }) {
           </div>
         )}
 
-        <div className="flex items-center justify-between mt-4 pt-4 border-t border-white/10">
+        <div className="flex items-center justify-between mt-4 pt-4 border-t border-black/[0.06] dark:border-white/10">
           <button
             onClick={() => setExpanded((v) => !v)}
-            className="flex items-center gap-1.5 text-white/40 hover:text-purple-400 text-xs tracking-widest uppercase transition-colors"
+            className="flex items-center gap-1.5 text-gray-400 dark:text-white/40 hover:text-purple-500 dark:hover:text-purple-400 text-xs tracking-widest uppercase transition-colors"
           >
             {expanded ? 'Show Less' : 'Show More'}
             <svg className={`w-3.5 h-3.5 transition-transform ${expanded ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -201,10 +212,18 @@ function ConcertCard({ post, onDelete, onEdit, isOwn }) {
           </button>
 
           <div className="flex items-center gap-3">
-            {(onEdit || onDelete) && (
+            {(onEdit || onDelete || onCancel) && (
               <>
+                {onCancel && (
+                  <button onClick={() => onCancel(post)} className="text-gray-300 dark:text-white/30 hover:text-orange-400 transition-colors" aria-label="Cancel show" title="Cancel show">
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5}
+                        d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
+                    </svg>
+                  </button>
+                )}
                 {onEdit && (
-                  <button onClick={() => onEdit(post)} className="text-white/30 hover:text-purple-400 transition-colors" aria-label="Edit">
+                  <button onClick={() => onEdit(post)} className="text-gray-300 dark:text-white/30 hover:text-purple-400 transition-colors" aria-label="Edit">
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5}
                         d="M15.232 5.232l3.536 3.536M9 13l6.586-6.586a2 2 0 012.828 0l.172.172a2 2 0 010 2.828L12 16H9v-3z" />
@@ -212,7 +231,7 @@ function ConcertCard({ post, onDelete, onEdit, isOwn }) {
                   </button>
                 )}
                 {onDelete && (
-                  <button onClick={() => onDelete(post.id)} className="text-white/30 hover:text-red-400 transition-colors" aria-label="Delete">
+                  <button onClick={() => onDelete(post.id)} className="text-gray-300 dark:text-white/30 hover:text-red-400 transition-colors" aria-label="Delete">
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5}
                         d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -257,10 +276,10 @@ function PostForm({ onSubmit, onCancel, initialData }) {
   }
 
   return (
-    <div className="backdrop-blur-xl bg-white/10 border border-purple-400/30 rounded-3xl p-6 shadow-[0_0_60px_rgba(168,85,247,0.15)] relative overflow-hidden mb-6">
+    <div className="backdrop-blur-xl bg-white/70 dark:bg-white/10 border border-purple-300/50 dark:border-purple-400/30 rounded-3xl p-6 shadow-[0_0_60px_rgba(168,85,247,0.15)] relative overflow-hidden mb-6">
       <div className="absolute -top-12 -right-12 w-48 h-48 bg-purple-600/20 rounded-full blur-3xl pointer-events-none" />
 
-      <h2 className="text-white font-bold text-sm tracking-widest uppercase mb-5 pb-3 border-b border-white/10">
+      <h2 className="text-gray-900 dark:text-white font-bold text-sm tracking-widest uppercase mb-5 pb-3 border-b border-black/[0.06] dark:border-white/10">
         {isEditing ? 'Edit Concert' : 'Post a Concert'}
       </h2>
 
@@ -308,23 +327,27 @@ function PostForm({ onSubmit, onCancel, initialData }) {
 
           <div>
             <label className={labelClass}>Genre</label>
-            <select value={form.genre} onChange={handleChange('genre')}
-              className={`${inputClass} appearance-none`}>
-              {genres.map((g) => (
-                <option key={g} value={g} className="bg-gray-900">{g}</option>
-              ))}
-            </select>
+            <CustomSelect
+              value={form.genre}
+              onChange={handleChange('genre')}
+              options={genres}
+              className={inputClass}
+            />
           </div>
 
           <div>
             <label className={labelClass}>Age Restriction</label>
-            <select value={form.ageRestriction} onChange={handleChange('ageRestriction')}
-              className={`${inputClass} appearance-none`}>
-              <option value="" className="bg-gray-900">None</option>
-              <option value="All Ages" className="bg-gray-900">All Ages</option>
-              <option value="18+" className="bg-gray-900">18+</option>
-              <option value="21+" className="bg-gray-900">21+</option>
-            </select>
+            <CustomSelect
+              value={form.ageRestriction}
+              onChange={handleChange('ageRestriction')}
+              options={[
+                { value: '',         label: 'None' },
+                { value: 'All Ages', label: 'All Ages' },
+                { value: '18+',      label: '18+' },
+                { value: '21+',      label: '21+' },
+              ]}
+              className={inputClass}
+            />
           </div>
 
           {/* Image URL */}
@@ -387,8 +410,11 @@ export default function Feed() {
   const [saved, setSaved] = useState(false)
   const [genreFilter, setGenreFilter] = useState('all')
   const [dateFilter, setDateFilter] = useState('all')
+  const [searchParams, setSearchParams] = useSearchParams()
+  const searchQuery = searchParams.get('q') ?? ''
 
-  const MY_BAND_ID = parseInt(localStorage.getItem('bandId') ?? '10')
+  const isLoggedIn  = !!localStorage.getItem('bandId')
+  const MY_BAND_ID  = parseInt(localStorage.getItem('bandId') ?? '0')
 
   useEffect(() => {
     getAllShows()
@@ -401,6 +427,16 @@ export default function Feed() {
   today.setHours(0, 0, 0, 0)
 
   const filteredPosts = posts.filter((post) => {
+    if (searchQuery) {
+      const q = searchQuery.toLowerCase()
+      const matches =
+        post.bandName?.toLowerCase().includes(q) ||
+        post.venue?.toLowerCase().includes(q) ||
+        post.genre?.toLowerCase().includes(q) ||
+        post.address?.toLowerCase().includes(q) ||
+        post.lineup?.toLowerCase().includes(q)
+      if (!matches) return false
+    }
     if (genreFilter !== 'all' && post.genre !== genreFilter) return false
     if (dateFilter === 'my-shows') return post.bandId === MY_BAND_ID
     const postDate = new Date(post.date + 'T00:00:00')
@@ -416,7 +452,7 @@ export default function Feed() {
     return true
   })
 
-  function buildShowPayload(form) {
+  function buildShowPayload(form, status = 'UPCOMING') {
     const price = parseFloat(form.ticketPrice?.replace(/[^0-9.]/g, ''))
     return {
       band:           { userId: MY_BAND_ID },
@@ -432,7 +468,7 @@ export default function Feed() {
       description:    form.description                     || null,
       image:          form.imageUrl                        || null,
       ticketUrl:      form.ticketUrl                       || null,
-      showStatus:     'UPCOMING',
+      showStatus:     status,
     }
   }
 
@@ -483,10 +519,26 @@ export default function Feed() {
     }
   }
 
+  async function handleCancel(post) {
+    try {
+      const updated = await updateShow(post.id, buildShowPayload({
+        venue: post.venue, address: post.address, date: post.date,
+        doorsTime: post.doorsTime, time: post.time,
+        ticketPrice: post.ticketPrice, genre: post.genre,
+        ageRestriction: post.ageRestriction, lineup: post.lineup,
+        description: post.description, imageUrl: post.imageUrl,
+        ticketUrl: post.ticketUrl,
+      }, 'CANCELLED'))
+      setPosts((prev) => prev.map((p) => p.id === post.id ? { ...showToPost(updated), bandName: post.bandName } : p))
+    } catch (err) {
+      setError(err.message)
+    }
+  }
+
   const isFormOpen = showForm || !!editingPost
 
   return (
-    <div className="relative min-h-screen" style={{ background: '#08080f' }}>
+    <div className="relative min-h-screen" style={{ background: 'var(--page-bg)' }}>
       <CloudLayer />
 
       <div className="relative z-20">
@@ -497,48 +549,47 @@ export default function Feed() {
 
             {/* ── Left sidebar (desktop only) ── */}
             <aside className="w-64 flex-shrink-0 sticky top-28 self-start hidden lg:block">
-              <div className="backdrop-blur-xl bg-white/10 border border-white/20 rounded-3xl p-6">
-                <h3 className="text-white font-bold text-sm tracking-widest uppercase mb-4">Filters</h3>
+              <div className="backdrop-blur-xl bg-white/70 dark:bg-white/10 border border-black/[0.08] dark:border-white/20 rounded-3xl p-6">
+                <h3 className="text-gray-900 dark:text-white font-bold text-sm tracking-widest uppercase mb-4">Filters</h3>
 
                 <div className="mb-4">
-                  <label className="text-white/60 text-xs uppercase tracking-widest mb-2 block">Genre</label>
-                  <select
+                  <label className="text-gray-500 dark:text-white/60 text-xs uppercase tracking-widest mb-2 block">Genre</label>
+                  <CustomSelect
                     value={genreFilter}
                     onChange={(e) => setGenreFilter(e.target.value)}
-                    className="w-full bg-white/10 border border-white/20 text-white text-sm px-3 py-2 rounded-lg focus:outline-none focus:border-purple-400/40 [color-scheme:dark]"
-                  >
-                    <option value="all">All Genres</option>
-                    {genres.map((g) => <option key={g} value={g}>{g}</option>)}
-                  </select>
+                    options={[{ value: 'all', label: 'All Genres' }, ...genres.map((g) => ({ value: g, label: g }))]}
+                    className="w-full bg-white/80 dark:bg-white/10 border border-gray-200 dark:border-white/20 text-gray-900 dark:text-white text-sm px-3 py-2 rounded-lg focus:outline-none focus:border-purple-400 dark:focus:border-purple-400/40"
+                  />
                 </div>
 
                 <div className="mb-4">
-                  <label className="text-white/60 text-xs uppercase tracking-widest mb-2 block">When</label>
-                  <select
+                  <label className="text-gray-500 dark:text-white/60 text-xs uppercase tracking-widest mb-2 block">When</label>
+                  <CustomSelect
                     value={dateFilter}
                     onChange={(e) => setDateFilter(e.target.value)}
-                    className="w-full bg-white/10 border border-white/20 text-white text-sm px-3 py-2 rounded-lg focus:outline-none focus:border-purple-400/40 [color-scheme:dark]"
-                  >
-                    <option value="all">All Shows</option>
-                    <option value="upcoming">Upcoming</option>
-                    <option value="this-week">This Week</option>
-                    <option value="this-month">This Month</option>
-                    <option value="my-shows">My Shows</option>
-                  </select>
+                    options={[
+                      { value: 'all',        label: 'All Shows' },
+                      { value: 'upcoming',   label: 'Upcoming' },
+                      { value: 'this-week',  label: 'This Week' },
+                      { value: 'this-month', label: 'This Month' },
+                      { value: 'my-shows',   label: 'My Shows' },
+                    ]}
+                    className="w-full bg-white/80 dark:bg-white/10 border border-gray-200 dark:border-white/20 text-gray-900 dark:text-white text-sm px-3 py-2 rounded-lg focus:outline-none focus:border-purple-400 dark:focus:border-purple-400/40"
+                  />
                 </div>
 
-                <div className="mt-6 pt-6 border-t border-white/10">
-                  <p className="text-white/40 text-xs uppercase tracking-widest mb-3">Your Stats</p>
+                <div className="mt-6 pt-6 border-t border-black/[0.06] dark:border-white/10">
+                  <p className="text-gray-400 dark:text-white/40 text-xs uppercase tracking-widest mb-3">Your Stats</p>
                   <div className="space-y-2">
                     <div className="flex justify-between text-sm">
-                      <span className="text-white/60">Shows Posted</span>
-                      <span className="text-white font-bold">
+                      <span className="text-gray-500 dark:text-white/60">Shows Posted</span>
+                      <span className="text-gray-900 dark:text-white font-bold">
                         {posts.filter((p) => p.bandId === MY_BAND_ID).length}
                       </span>
                     </div>
                     <div className="flex justify-between text-sm">
-                      <span className="text-white/60">Total Interested</span>
-                      <span className="text-white font-bold">
+                      <span className="text-gray-500 dark:text-white/60">Total Interested</span>
+                      <span className="text-gray-900 dark:text-white font-bold">
                         {posts
                           .filter((p) => p.bandId === MY_BAND_ID)
                           .reduce((sum, p) => sum + (p.interested || 0), 0)}
@@ -555,8 +606,20 @@ export default function Feed() {
               {/* Page header */}
               <div className="flex flex-wrap items-start justify-between gap-4 mb-6">
                 <div>
-                  <h1 className="text-white font-black text-2xl tracking-widest uppercase">Concert Feed</h1>
-                  <p className="text-white/40 text-sm mt-1">Announce your upcoming shows</p>
+                  <h1 className="text-gray-900 dark:text-white font-black text-2xl tracking-widest uppercase">Concert Feed</h1>
+                  {searchQuery ? (
+                    <div className="flex items-center gap-2 mt-1">
+                      <p className="text-white/40 text-sm">Results for <span className="text-purple-400">"{searchQuery}"</span></p>
+                      <button
+                        onClick={() => setSearchParams({})}
+                        className="text-white/30 hover:text-white/60 text-xs tracking-widest uppercase transition-colors"
+                      >
+                        Clear
+                      </button>
+                    </div>
+                  ) : (
+                    <p className="text-gray-400 dark:text-white/40 text-sm mt-1">Announce your upcoming shows</p>
+                  )}
                 </div>
                 <div className="flex items-center gap-4 flex-shrink-0">
                   {error && (
@@ -570,17 +633,25 @@ export default function Feed() {
                       {saved ? 'Saved' : 'Posted'}
                     </span>
                   )}
-                  {!isFormOpen && (
+                  {isLoggedIn && !isFormOpen && (
                     <button
                       onClick={() => setShowForm(true)}
                       disabled={submitting}
-                      className="bg-purple-600/60 hover:bg-purple-600 backdrop-blur-sm border border-purple-400/40 text-white text-sm tracking-widest uppercase px-6 py-3 rounded-full transition-all flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="bg-purple-600/60 hover:bg-purple-600 backdrop-blur-sm border border-purple-400/40 text-white text-sm tracking-widest uppercase px-6 py-2.5 rounded-full transition-all flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                       </svg>
                       Post Concert
                     </button>
+                  )}
+                  {!isLoggedIn && (
+                    <a
+                      href="/?signup=1"
+                      className="bg-purple-600/60 hover:bg-purple-600 border border-purple-400/40 text-white text-sm tracking-widest uppercase px-6 py-2.5 rounded-full transition-all"
+                    >
+                      Join to Post
+                    </a>
                   )}
                 </div>
               </div>
@@ -601,37 +672,36 @@ export default function Feed() {
 
               {/* Mobile-only pill filters */}
               <div className="flex items-center gap-3 mb-6 lg:hidden">
-                <select
+                <CustomSelect
                   value={genreFilter}
                   onChange={(e) => setGenreFilter(e.target.value)}
-                  className="bg-white/10 border border-white/20 text-white text-sm px-4 py-2 rounded-full focus:outline-none focus:border-purple-400/40 [color-scheme:dark]"
-                >
-                  <option value="all">All Genres</option>
-                  {genres.map((g) => <option key={g} value={g}>{g}</option>)}
-                </select>
-                <select
+                  options={[{ value: 'all', label: 'All Genres' }, ...genres.map((g) => ({ value: g, label: g }))]}
+                  className="bg-white/80 dark:bg-white/10 border border-gray-200 dark:border-white/20 text-gray-900 dark:text-white text-sm px-4 py-2 rounded-full focus:outline-none focus:border-purple-400 dark:focus:border-purple-400/40"
+                />
+                <CustomSelect
                   value={dateFilter}
                   onChange={(e) => setDateFilter(e.target.value)}
-                  className="bg-white/10 border border-white/20 text-white text-sm px-4 py-2 rounded-full focus:outline-none focus:border-purple-400/40 [color-scheme:dark]"
-                >
-                  <option value="upcoming">Upcoming</option>
-                  <option value="this-week">This Week</option>
-                  <option value="this-month">This Month</option>
-                </select>
+                  options={[
+                    { value: 'upcoming',   label: 'Upcoming' },
+                    { value: 'this-week',  label: 'This Week' },
+                    { value: 'this-month', label: 'This Month' },
+                  ]}
+                  className="bg-white/80 dark:bg-white/10 border border-gray-200 dark:border-white/20 text-gray-900 dark:text-white text-sm px-4 py-2 rounded-full focus:outline-none focus:border-purple-400 dark:focus:border-purple-400/40"
+                />
               </div>
 
               {/* Feed list */}
               {loading ? (
-                <div className="backdrop-blur-xl bg-white/5 border border-white/10 rounded-3xl p-16 text-center">
-                  <p className="text-white/30 text-sm tracking-widest uppercase">Loading shows…</p>
+                <div className="backdrop-blur-xl bg-black/5 dark:bg-white/5 border border-black/[0.06] dark:border-white/10 rounded-3xl p-16 text-center">
+                  <p className="text-gray-400 dark:text-white/30 text-sm tracking-widest uppercase">Loading shows…</p>
                 </div>
               ) : filteredPosts.length === 0 ? (
-                <div className="backdrop-blur-xl bg-white/5 border border-white/10 rounded-3xl p-16 text-center">
-                  <svg className="w-12 h-12 text-white/20 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div className="backdrop-blur-xl bg-black/5 dark:bg-white/5 border border-black/[0.06] dark:border-white/10 rounded-3xl p-16 text-center">
+                  <svg className="w-12 h-12 text-gray-300 dark:text-white/20 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5}
                       d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
                   </svg>
-                  <p className="text-white/30 text-sm tracking-widest uppercase">
+                  <p className="text-gray-400 dark:text-white/30 text-sm tracking-widest uppercase">
                     {posts.length === 0 ? 'No concerts posted yet' : 'No concerts match these filters'}
                   </p>
                   {posts.length === 0 && (
@@ -650,8 +720,9 @@ export default function Feed() {
                       key={post.id}
                       post={post}
                       isOwn={post.bandId === MY_BAND_ID}
-                      onEdit={post.bandId === MY_BAND_ID ? handleEdit : null}
+                      onEdit={post.bandId === MY_BAND_ID && post.showStatus !== 'CANCELLED' ? handleEdit : null}
                       onDelete={post.bandId === MY_BAND_ID ? handleDelete : null}
+                      onCancel={post.bandId === MY_BAND_ID && post.showStatus !== 'CANCELLED' ? handleCancel : null}
                     />
                   ))}
                 </div>

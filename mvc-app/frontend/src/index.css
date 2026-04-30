@@ -4,6 +4,16 @@
   --font-sans: 'Lato', sans-serif;
 }
 
+@custom-variant dark (&:where(.dark, .dark *));
+
+
+:root {
+  --page-bg: #f5f0eb;
+}
+.dark {
+  --page-bg: #08080f;
+}
+
 /* Strip Mapbox default popup chrome */
 .mapboxgl-popup-content {
   background: transparent !important;
@@ -13,6 +23,23 @@
 }
 .mapboxgl-popup-tip {
   display: none !important;
+}
+
+@keyframes fadeSlideUp {
+  0%   { opacity: 0; transform: translateY(32px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes floatBob {
+  0%   { transform: translateY(0px) rotate(3deg); }
+  50%  { transform: translateY(-8px) rotate(5deg); }
+  100% { transform: translateY(0px) rotate(3deg); }
+}
+
+@keyframes glowPulse {
+  0%   { opacity: 0.15; transform: scale(1); }
+  50%  { opacity: 0.30; transform: scale(1.15); }
+  100% { opacity: 0.15; transform: scale(1); }
 }
 
 @keyframes drift1 {

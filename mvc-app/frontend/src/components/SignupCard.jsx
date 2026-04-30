@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { createBand } from '../api'
+import CustomSelect from './CustomSelect'
 
 export default function SignupCard({ onClose, onSwitch }) {
   const navigate = useNavigate()
@@ -46,25 +47,25 @@ export default function SignupCard({ onClose, onSwitch }) {
     }
   }
 
-  const inputClass = 'w-full bg-white/10 border border-white/20 text-white px-4 py-3 rounded-lg focus:outline-none focus:border-purple-400/40 placeholder-white/40'
+  const inputClass = 'w-full bg-white/80 dark:bg-white/10 border border-gray-200 dark:border-white/20 text-gray-900 dark:text-white px-4 py-3 rounded-lg focus:outline-none focus:border-purple-400 dark:focus:border-purple-400/40 placeholder-gray-400 dark:placeholder-white/40'
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center" onClick={onClose}>
       <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
 
       <div
-        className="relative backdrop-blur-xl bg-white/10 border border-white/20 rounded-3xl p-8 shadow-[0_0_40px_rgba(168,85,247,0.15)] w-full max-w-md mx-4 max-h-[90vh] overflow-y-auto"
+        className="relative backdrop-blur-xl bg-white/80 dark:bg-white/10 border border-black/[0.08] dark:border-white/20 rounded-3xl p-8 shadow-[0_0_40px_rgba(168,85,247,0.15)] w-full max-w-md mx-4 max-h-[90vh] overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
       >
-        <button onClick={onClose} className="absolute top-4 right-5 text-white/60 hover:text-white text-lg">✕</button>
+        <button onClick={onClose} className="absolute top-4 right-5 text-gray-400 dark:text-white/60 hover:text-gray-900 dark:hover:text-white text-lg">✕</button>
 
-        <h1 className="text-white font-bold text-3xl tracking-widest uppercase mb-2 text-center">Sign Up</h1>
-        <p className="text-white/70 text-sm text-center mb-6">Join the scene</p>
+        <h1 className="text-gray-900 dark:text-white font-bold text-3xl tracking-widest uppercase mb-2 text-center">Sign Up</h1>
+        <p className="text-gray-500 dark:text-white/70 text-sm text-center mb-6">Join the scene</p>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* Role selection */}
           <div>
-            <label className="text-white/80 text-sm font-bold mb-3 block">I am a...</label>
+            <label className="text-gray-700 dark:text-white/80 text-sm font-bold mb-3 block">I am a...</label>
             <div className="flex gap-3">
               {['Band / Artist', 'Customer'].map((role) => (
                 <button
@@ -84,7 +85,7 @@ export default function SignupCard({ onClose, onSwitch }) {
           </div>
 
           <div>
-            <label className="text-white/80 text-sm font-bold mb-2 block">Full Name</label>
+            <label className="text-gray-700 dark:text-white/80 text-sm font-bold mb-2 block">Full Name</label>
             <input
               type="text"
               value={formData.name}
@@ -96,7 +97,7 @@ export default function SignupCard({ onClose, onSwitch }) {
           </div>
 
           <div>
-            <label className="text-white/80 text-sm font-bold mb-2 block">Email</label>
+            <label className="text-gray-700 dark:text-white/80 text-sm font-bold mb-2 block">Email</label>
             <input
               type="email"
               value={formData.email}
@@ -111,7 +112,7 @@ export default function SignupCard({ onClose, onSwitch }) {
           {formData.role === 'Band / Artist' && (
             <>
               <div>
-                <label className="text-white/80 text-sm font-bold mb-2 block">Band / Artist Name</label>
+                <label className="text-gray-700 dark:text-white/80 text-sm font-bold mb-2 block">Band / Artist Name</label>
                 <input
                   type="text"
                   value={formData.bandName}
@@ -123,29 +124,29 @@ export default function SignupCard({ onClose, onSwitch }) {
               </div>
 
               <div>
-                <label className="text-white/80 text-sm font-bold mb-2 block">Genre</label>
-                <select
+                <label className="text-gray-700 dark:text-white/80 text-sm font-bold mb-2 block">Genre</label>
+                <CustomSelect
                   value={formData.genre}
                   onChange={(e) => setFormData({ ...formData, genre: e.target.value })}
-                  className={`${inputClass} appearance-none`}
-                  required
-                >
-                  <option value="" disabled className="bg-gray-900">Select a genre</option>
-                  <option value="rock" className="bg-gray-900">Rock</option>
-                  <option value="jazz" className="bg-gray-900">Jazz</option>
-                  <option value="hip-hop" className="bg-gray-900">Hip-Hop</option>
-                  <option value="r&b" className="bg-gray-900">R&B</option>
-                  <option value="country" className="bg-gray-900">Country</option>
-                  <option value="electronic" className="bg-gray-900">Electronic</option>
-                  <option value="pop" className="bg-gray-900">Pop</option>
-                  <option value="other" className="bg-gray-900">Other</option>
-                </select>
+                  placeholder="Select a genre"
+                  options={[
+                    { value: 'rock',       label: 'Rock' },
+                    { value: 'jazz',       label: 'Jazz' },
+                    { value: 'hip-hop',    label: 'Hip-Hop' },
+                    { value: 'r&b',        label: 'R&B' },
+                    { value: 'country',    label: 'Country' },
+                    { value: 'electronic', label: 'Electronic' },
+                    { value: 'pop',        label: 'Pop' },
+                    { value: 'other',      label: 'Other' },
+                  ]}
+                  className={inputClass}
+                />
               </div>
             </>
           )}
 
           <div>
-            <label className="text-white/80 text-sm font-bold mb-2 block">Password</label>
+            <label className="text-gray-700 dark:text-white/80 text-sm font-bold mb-2 block">Password</label>
             <input
               type="password"
               value={formData.password}
@@ -157,7 +158,7 @@ export default function SignupCard({ onClose, onSwitch }) {
           </div>
 
           <div>
-            <label className="text-white/80 text-sm font-bold mb-2 block">Confirm Password</label>
+            <label className="text-gray-700 dark:text-white/80 text-sm font-bold mb-2 block">Confirm Password</label>
             <input
               type="password"
               value={formData.confirmPassword}
@@ -179,9 +180,9 @@ export default function SignupCard({ onClose, onSwitch }) {
           </button>
         </form>
 
-        <p className="text-white/70 text-sm text-center mt-6">
+        <p className="text-gray-500 dark:text-white/70 text-sm text-center mt-6">
           Already have an account?{' '}
-          <button type="button" onClick={onSwitch} className="text-purple-400 hover:text-purple-300 font-bold">
+          <button type="button" onClick={onSwitch} className="text-purple-500 dark:text-purple-400 hover:text-purple-600 dark:hover:text-purple-300 font-bold">
             Log In
           </button>
         </p>
