@@ -2,6 +2,7 @@ package com.team09.demo.controller;
 
 import com.team09.demo.entity.Band;
 import com.team09.demo.service.BandService;
+import com.team09.demo.service.FollowService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,6 +15,9 @@ public class BandController {
 
     @Autowired
     private BandService bandService;
+
+    @Autowired
+    private FollowService followService;
 
     // POST /bands — Create band profile
     @PostMapping
@@ -52,6 +56,12 @@ public class BandController {
     @GetMapping("/genre/{genre}")
     public List<Band> getBandsByGenre(@PathVariable String genre) {
         return bandService.getBandsByGenre(genre);
+    }
+
+    // GET /bands/{id}/followers/count — Get follower count for a band
+    @GetMapping("/{id}/followers/count")
+    public long getFollowerCount(@PathVariable Long id) {
+        return followService.getFollowerCount(id);
     }
 
     // GET /bands/email/{email} — Get band by email (used for login)

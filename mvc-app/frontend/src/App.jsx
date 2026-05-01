@@ -9,6 +9,8 @@ import Stats from './pages/Stats'
 import Posts from './pages/Posts'
 import Bookings from './pages/Bookings'
 import Availability from './pages/Availability'
+import ShowDetails from './pages/ShowDetails'
+import BandPage from './pages/BandPage'
 
 function App() {
   return (
@@ -21,8 +23,10 @@ function App() {
           <Route path="/stats"     element={<ProtectedRoute><Stats /></ProtectedRoute>} />
           <Route path="/posts"     element={<ProtectedRoute><Posts /></ProtectedRoute>} />
           <Route path="/feed"      element={<Feed />} />
-          <Route path="/bookings" element={<Bookings />} />
+          <Route path="/bookings"  element={<Bookings />} />
           <Route path="/availability" element={<Availability />} />
+          <Route path="/show/:id"  element={<ShowDetails />} />
+          <Route path="/band/:id"  element={<BandPage />} />
         </Routes>
       </BrowserRouter>
     </ThemeProvider>

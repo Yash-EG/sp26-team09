@@ -8,29 +8,29 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "posts")
+@Table(name = "post_comments")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Post {
+public class PostComment {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long postId;
+    private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "band_id", nullable = false)
-    private Band band;
+    @JoinColumn(name = "post_id", nullable = false)
+    private Post post;
 
-    @Column(columnDefinition = "TEXT")
-    private String caption;
+    private Long customerId;
 
-    private String imageUrl;
+    @Column(nullable = false)
+    private String authorName;
+
+    @Column(nullable = false, length = 280)
+    private String text;
 
     private LocalDateTime createdAt;
-
-    @Column(columnDefinition = "integer default 0", nullable = false)
-    private int likeCount = 0;
 
     @PrePersist
     protected void onCreate() {

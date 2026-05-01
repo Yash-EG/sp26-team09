@@ -1,10 +1,14 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import CloudLayer from '../components/CloudLayer'
 import Navbar from '../components/Navbar'
+import { getInterestedShows, removeInterestedShow } from '../api'
 import tangerImg from '../assets/tanger.jpg'
 import uncgImg from '../assets/uncg_aud.jpg'
 import one13Img from '../assets/one13.jpg'
 import whiteoakImg from '../assets/whiteoak.jpg'
+
+// ─── Provider (Band) Bookings ───────────────────────────────────────────────
 
 const MOCK_REQUESTS = [
   {
@@ -28,7 +32,7 @@ const MOCK_REQUESTS = [
     time: '19:00',
     duration: '60 min',
     offer: '$400',
-    message: 'We\'re hosting a student arts night and would love a local band to headline. Stage and sound crew on site. Budget is flexible.',
+    message: "We're hosting a student arts night and would love a local band to headline. Stage and sound crew on site. Budget is flexible.",
     receivedAt: '2026-02-17T14:30:00',
     status: 'pending',
     venueImg: uncgImg,
@@ -62,9 +66,9 @@ const MOCK_REQUESTS = [
 ]
 
 const STATUS_STYLES = {
-  pending:  { dot: 'bg-yellow-400', badge: 'bg-yellow-400/15 border-yellow-400/30 text-yellow-300' },
-  accepted: { dot: 'bg-green-400',  badge: 'bg-green-400/15  border-green-400/30  text-green-300'  },
-  declined: { dot: 'bg-red-400',    badge: 'bg-red-400/15    border-red-400/30    text-red-300'    },
+  pending:  { badge: 'bg-yellow-400/15 border-yellow-400/30 text-yellow-300' },
+  accepted: { badge: 'bg-green-400/15  border-green-400/30  text-green-300'  },
+  declined: { badge: 'bg-red-400/15    border-red-400/30    text-red-300'    },
 }
 
 const TABS = ['All', 'Pending', 'Accepted', 'Declined']
@@ -103,7 +107,6 @@ function BookingCard({ req, onAccept, onDecline }) {
       )}
 
       <div className="p-6 relative z-10">
-        {/* Header */}
         <div className="flex items-start justify-between gap-4 mb-4">
           <div>
             <div className="flex items-center gap-2">
@@ -113,10 +116,6 @@ function BookingCard({ req, onAccept, onDecline }) {
               </span>
             </div>
             <div className="flex items-center gap-1.5 mt-1 text-white/40 text-xs">
-              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5}
-                  d="M17.657 16.657L13.414 20.9a2 2 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-              </svg>
               {req.address}
             </div>
           </div>
@@ -125,95 +124,53 @@ function BookingCard({ req, onAccept, onDecline }) {
           </span>
         </div>
 
-        {/* Details grid */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4">
           {[
-            {
-              icon: 'M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z',
-              label: 'Date',
-              value: formatDate(req.date),
-            },
-            {
-              icon: 'M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z',
-              label: 'Time',
-              value: formatTime(req.time),
-            },
-            {
-              icon: 'M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z',
-              label: 'Duration',
-              value: req.duration,
-            },
-            {
-              icon: 'M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z',
-              label: 'Offer',
-              value: req.offer,
-            },
-          ].map(({ icon, label, value }) => (
+            { label: 'Date',     value: formatDate(req.date) },
+            { label: 'Time',     value: formatTime(req.time) },
+            { label: 'Duration', value: req.duration },
+            { label: 'Offer',    value: req.offer },
+          ].map(({ label, value }) => (
             <div key={label} className="bg-white/5 rounded-xl px-3 py-2.5">
-              <div className="flex items-center gap-1.5 mb-1">
-                <svg className="w-3.5 h-3.5 text-purple-400/70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d={icon} />
-                </svg>
-                <span className="text-white/40 text-xs tracking-widest uppercase">{label}</span>
-              </div>
+              <span className="text-white/40 text-xs tracking-widest uppercase block mb-1">{label}</span>
               <span className="text-white text-sm font-semibold">{value}</span>
             </div>
           ))}
         </div>
 
-        {/* Message from venue */}
         <div className="bg-white/5 rounded-xl px-4 py-3 mb-4">
           <p className="text-white/40 text-xs tracking-widest uppercase mb-1">Message from venue</p>
           <p className="text-white/70 text-sm leading-relaxed">{req.message}</p>
         </div>
 
-        {/* Action buttons — pending only */}
         {req.status === 'pending' && (
           <div className="flex flex-wrap gap-3">
-            <button
-              onClick={() => onAccept(req.id)}
-              className="flex-1 bg-green-600/40 hover:bg-green-600/70 border border-green-400/40 text-green-300 text-sm tracking-widest uppercase py-2.5 rounded-full transition-all"
-            >
+            <button onClick={() => onAccept(req.id)} className="flex-1 bg-green-600/40 hover:bg-green-600/70 border border-green-400/40 text-green-300 text-sm tracking-widest uppercase py-2.5 rounded-full transition-all">
               Accept
             </button>
-            <button
-              onClick={() => onDecline(req.id)}
-              className="flex-1 bg-white/5 hover:bg-red-600/20 border border-white/10 hover:border-red-400/30 text-white/50 hover:text-red-300 text-sm tracking-widest uppercase py-2.5 rounded-full transition-all"
-            >
+            <button onClick={() => onDecline(req.id)} className="flex-1 bg-white/5 hover:bg-red-600/20 border border-white/10 hover:border-red-400/30 text-white/50 hover:text-red-300 text-sm tracking-widest uppercase py-2.5 rounded-full transition-all">
               Decline
             </button>
           </div>
         )}
-
         {req.status === 'accepted' && (
-          <div className="flex items-center gap-2 text-green-400 text-sm tracking-widest uppercase">
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-            </svg>
-            Booking confirmed
-          </div>
+          <p className="text-green-400 text-sm tracking-widest uppercase">Booking confirmed</p>
         )}
         {req.status === 'declined' && (
-          <div className="flex items-center gap-2 text-red-400/60 text-sm tracking-widest uppercase">
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            </svg>
-            Declined
-          </div>
+          <p className="text-red-400/60 text-sm tracking-widest uppercase">Declined</p>
         )}
       </div>
     </div>
   )
 }
 
-export default function Bookings() {
+function ProviderBookings() {
   const [requests, setRequests] = useState(MOCK_REQUESTS)
   const [activeTab, setActiveTab] = useState('All')
 
   function handleAccept(id) {
     setRequests((prev) => prev.map((r) => r.id === id ? { ...r, status: 'accepted' } : r))
   }
-
   function handleDecline(id) {
     setRequests((prev) => prev.map((r) => r.id === id ? { ...r, status: 'declined' } : r))
   }
@@ -232,16 +189,12 @@ export default function Bookings() {
   return (
     <div className="relative min-h-screen" style={{ background: '#08080f' }}>
       <CloudLayer />
-
       <div className="relative z-20">
         <Navbar />
-
         <div className="max-w-3xl mx-auto px-4 pt-28 pb-28">
-
-          {/* Page header */}
           <div className="mb-6">
             <h1 className="text-white font-black text-2xl tracking-widest uppercase">Bookings</h1>
-            <p className="text-white/40 text-sm mt-1">Venue requests for The Midnight Echo</p>
+            <p className="text-white/40 text-sm mt-1">Venue requests for your band</p>
           </div>
 
           <div className="flex gap-3 mb-6 flex-wrap">
@@ -266,9 +219,7 @@ export default function Bookings() {
                 key={tab}
                 onClick={() => setActiveTab(tab)}
                 className={`flex-1 text-xs tracking-widest uppercase py-2 rounded-xl transition-all ${
-                  activeTab === tab
-                    ? 'bg-purple-600/60 border border-purple-400/40 text-white'
-                    : 'text-white/40 hover:text-white'
+                  activeTab === tab ? 'bg-purple-600/60 border border-purple-400/40 text-white' : 'text-white/40 hover:text-white'
                 }`}
               >
                 {tab}
@@ -276,30 +227,128 @@ export default function Bookings() {
             ))}
           </div>
 
-          {/* Request list */}
           {visible.length === 0 ? (
             <div className="backdrop-blur-xl bg-white/5 border border-white/10 rounded-3xl p-16 text-center">
-              <svg className="w-12 h-12 text-white/20 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5}
-                  d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-              </svg>
               <p className="text-white/30 text-sm tracking-widest uppercase">No {activeTab.toLowerCase()} requests</p>
             </div>
           ) : (
             <div className="space-y-4">
               {visible.map((req) => (
-                <BookingCard
-                  key={req.id}
-                  req={req}
-                  onAccept={handleAccept}
-                  onDecline={handleDecline}
-                />
+                <BookingCard key={req.id} req={req} onAccept={handleAccept} onDecline={handleDecline} />
               ))}
             </div>
           )}
-
         </div>
       </div>
     </div>
   )
+}
+
+// ─── Customer Bookings (Saved / Interested Shows) ───────────────────────────
+
+function CustomerBookings() {
+  const navigate = useNavigate()
+  const customerId = localStorage.getItem('customerId')
+  const [savedShows, setSavedShows] = useState([])
+
+  useEffect(() => {
+    if (!customerId) return
+    getInterestedShows(customerId)
+      .then(setSavedShows)
+      .catch(console.error)
+  }, [customerId])
+
+  const handleRemoveShow = async (showId) => {
+    try {
+      await removeInterestedShow(customerId, showId)
+      setSavedShows((prev) => prev.filter((s) => s.showId !== showId))
+    } catch (err) {
+      console.error(err)
+    }
+  }
+
+  return (
+    <div className="relative min-h-screen" style={{ background: 'var(--page-bg)' }}>
+      <CloudLayer />
+
+      <div className="relative z-20">
+        <Navbar />
+
+        <div className="max-w-3xl mx-auto px-4 pt-28 pb-28">
+          <div className="mb-6">
+            <h1 className="text-gray-900 dark:text-white font-black text-2xl tracking-widest uppercase">My Shows</h1>
+            <p className="text-gray-400 dark:text-white/40 text-sm mt-1">Shows you've saved</p>
+          </div>
+
+          <div className="space-y-4">
+            {savedShows.length === 0 ? (
+              <div className="backdrop-blur-xl bg-black/5 dark:bg-white/5 border border-black/[0.06] dark:border-white/10 rounded-3xl p-16 text-center">
+                <p className="text-gray-400 dark:text-white/30 text-sm tracking-widest uppercase">
+                  No saved shows yet.{' '}
+                  <button onClick={() => navigate('/feed')} className="text-purple-500 dark:text-purple-400 hover:underline">
+                    Browse the feed
+                  </button>
+                  {' '}to save some!
+                </p>
+              </div>
+            ) : (
+              savedShows.map((show) => (
+                <article key={show.showId} className="backdrop-blur-xl bg-white/70 dark:bg-white/10 border border-black/[0.08] dark:border-white/20 rounded-3xl overflow-hidden shadow-[0_0_40px_rgba(168,85,247,0.08)] hover:shadow-[0_0_50px_rgba(168,85,247,0.15)] transition-all relative">
+                  <div className="absolute -top-10 -right-10 w-40 h-40 bg-purple-600/10 rounded-full blur-3xl pointer-events-none" />
+
+                  <div className="w-full h-52 bg-gradient-to-br from-purple-100 dark:from-purple-900/40 to-blue-100 dark:to-blue-900/40 relative overflow-hidden">
+                    <img src={show.image} alt={show.band?.name} className="w-full h-full object-cover opacity-80" />
+                    <div className="absolute top-4 right-4">
+                      <span className="bg-purple-600/60 backdrop-blur-sm border border-purple-400/40 text-white text-xs tracking-widest uppercase px-3 py-1 rounded-full">
+                        {show.genre}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="p-6 relative z-10">
+                    <div className="flex items-start gap-4 mb-4">
+                      <div className="w-12 h-12 rounded-full border border-black/10 dark:border-white/30 bg-black/5 dark:bg-white/10 flex items-center justify-center flex-shrink-0">
+                        <span className="text-gray-900 dark:text-white text-lg font-bold">{show.band?.name?.[0]}</span>
+                      </div>
+                      <div className="flex-1">
+                        <h3 className="text-gray-900 dark:text-white font-black text-lg tracking-widest uppercase">{show.band?.name}</h3>
+                        <p className="text-gray-500 dark:text-white/60 text-sm mt-0.5">{show.location} • {show.date}</p>
+                      </div>
+                      <span className="text-purple-500 dark:text-purple-400 font-bold text-lg">${show.ticketPrice}</span>
+                    </div>
+
+                    {show.description && (
+                      <p className="text-gray-600 dark:text-white/60 text-sm leading-relaxed mb-4">{show.description}</p>
+                    )}
+
+                    <div className="flex gap-3 pt-2 border-t border-black/[0.06] dark:border-white/10">
+                      <button
+                        onClick={() => navigate(`/show/${show.showId}`)}
+                        className="flex-1 bg-purple-600/60 hover:bg-purple-600 backdrop-blur-sm border border-purple-400/40 text-white text-xs tracking-widest uppercase px-4 py-2.5 rounded-full transition-all"
+                      >
+                        View Details
+                      </button>
+                      <button
+                        onClick={() => handleRemoveShow(show.showId)}
+                        className="bg-white/5 dark:bg-white/5 hover:bg-red-600/20 border border-black/[0.08] dark:border-white/10 hover:border-red-400/30 text-gray-500 dark:text-white/50 hover:text-red-400 text-xs tracking-widest uppercase px-4 py-2.5 rounded-full transition-all"
+                      >
+                        Remove
+                      </button>
+                    </div>
+                  </div>
+                </article>
+              ))
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// ─── Default export — role-based ────────────────────────────────────────────
+
+export default function Bookings() {
+  const isCustomer = !!localStorage.getItem('customerId')
+  return isCustomer ? <CustomerBookings /> : <ProviderBookings />
 }

@@ -1,9 +1,9 @@
-import { useState, useRef, useEffect } from 'react'
-import { useSearchParams } from 'react-router-dom'
+import { useState, useEffect } from 'react'
+import { useSearchParams, useNavigate } from 'react-router-dom'
 import CloudLayer from '../components/CloudLayer'
 import Navbar from '../components/Navbar'
 import CustomSelect from '../components/CustomSelect'
-import { getAllShows, createShow, updateShow, deleteShow } from '../api'
+import { getAllShows, createShow, updateShow, deleteShow, getInterestedShows, addInterestedShow, removeInterestedShow, getFollowedBands } from '../api'
 
 const inputClass =
   'w-full bg-white/80 dark:bg-white/10 border border-gray-200 dark:border-white/20 text-gray-900 dark:text-white px-4 py-3 rounded-lg focus:outline-none focus:border-purple-400 dark:focus:border-purple-400/40 placeholder-gray-400 dark:placeholder-white/40 transition-colors'
@@ -61,8 +61,9 @@ function formatTime(timeStr) {
   return `${hour}:${m.toString().padStart(2, '0')} ${ampm}`
 }
 
-function ConcertCard({ post, onDelete, onEdit, onCancel, isOwn }) {
+function ConcertCard({ post, onDelete, onEdit, onCancel, isOwn, isCustomer, isSaved, onSave }) {
   const [expanded, setExpanded] = useState(false)
+  const navigate = useNavigate()
   const isCancelled = post.showStatus === 'CANCELLED'
 
   return (
@@ -212,6 +213,27 @@ function ConcertCard({ post, onDelete, onEdit, onCancel, isOwn }) {
           </button>
 
           <div className="flex items-center gap-3">
+            {/* Customer actions */}
+            {isCustomer && (
+              <>
+                <button
+                  onClick={() => navigate(`/show/${post.id}`)}
+                  className="bg-purple-600/40 hover:bg-purple-600/70 border border-purple-400/30 text-purple-200 text-xs tracking-widest uppercase px-4 py-1.5 rounded-full transition-all"
+                >
+                  Details
+                </button>
+                <button
+                  onClick={() => onSave && onSave(post.id)}
+                  className={`text-sm transition-colors ${
+                    isSaved ? 'text-red-400 hover:text-red-300' : 'text-gray-400 dark:text-white/30 hover:text-red-400'
+                  }`}
+                  title={isSaved ? 'Unsave show' : 'Save show'}
+                >
+                  ♥
+                </button>
+              </>
+            )}
+            {/* Provider actions */}
             {(onEdit || onDelete || onCancel) && (
               <>
                 {onCancel && (
@@ -412,9 +434,15 @@ export default function Feed() {
   const [dateFilter, setDateFilter] = useState('all')
   const [searchParams, setSearchParams] = useSearchParams()
   const searchQuery = searchParams.get('q') ?? ''
+  const [savedShowIds, setSavedShowIds] = useState(new Set())
+  const [followingFilter, setFollowingFilter] = useState(false)
+  const [followedBandIds, setFollowedBandIds] = useState(new Set())
 
-  const isLoggedIn  = !!localStorage.getItem('bandId')
+  const isProvider  = !!localStorage.getItem('bandId')
+  const isCustomer  = !!localStorage.getItem('customerId')
+  const isLoggedIn  = isProvider || isCustomer
   const MY_BAND_ID  = parseInt(localStorage.getItem('bandId') ?? '0')
+  const customerId  = localStorage.getItem('customerId')
 
   useEffect(() => {
     getAllShows()
@@ -422,6 +450,38 @@ export default function Feed() {
       .catch((err) => setError(err.message))
       .finally(() => setLoading(false))
   }, [])
+
+  // Load customer's saved shows
+  useEffect(() => {
+    if (!customerId) return
+    getInterestedShows(customerId)
+      .then((shows) => setSavedShowIds(new Set(shows.map((s) => s.showId))))
+      .catch(console.error)
+  }, [customerId])
+
+  // Load customer's followed bands
+  useEffect(() => {
+    if (!customerId) return
+    getFollowedBands(customerId)
+      .then((bands) => setFollowedBandIds(new Set(bands.map((b) => b.userId))))
+      .catch(console.error)
+  }, [customerId])
+
+  async function handleSaveShow(showId) {
+    if (!customerId) return
+    const isSaved = savedShowIds.has(showId)
+    try {
+      if (isSaved) {
+        await removeInterestedShow(customerId, showId)
+        setSavedShowIds((prev) => { const s = new Set(prev); s.delete(showId); return s })
+      } else {
+        await addInterestedShow(customerId, showId)
+        setSavedShowIds((prev) => new Set([...prev, showId]))
+      }
+    } catch (err) {
+      console.error(err)
+    }
+  }
 
   const today = new Date()
   today.setHours(0, 0, 0, 0)
@@ -438,6 +498,7 @@ export default function Feed() {
       if (!matches) return false
     }
     if (genreFilter !== 'all' && post.genre !== genreFilter) return false
+    if (followingFilter && !followedBandIds.has(post.bandId)) return false
     if (dateFilter === 'my-shows') return post.bandId === MY_BAND_ID
     const postDate = new Date(post.date + 'T00:00:00')
     if (dateFilter === 'upcoming') return postDate >= today
@@ -578,25 +639,43 @@ export default function Feed() {
                   />
                 </div>
 
-                <div className="mt-6 pt-6 border-t border-black/[0.06] dark:border-white/10">
-                  <p className="text-gray-400 dark:text-white/40 text-xs uppercase tracking-widest mb-3">Your Stats</p>
-                  <div className="space-y-2">
-                    <div className="flex justify-between text-sm">
-                      <span className="text-gray-500 dark:text-white/60">Shows Posted</span>
-                      <span className="text-gray-900 dark:text-white font-bold">
-                        {posts.filter((p) => p.bandId === MY_BAND_ID).length}
-                      </span>
-                    </div>
-                    <div className="flex justify-between text-sm">
-                      <span className="text-gray-500 dark:text-white/60">Total Interested</span>
-                      <span className="text-gray-900 dark:text-white font-bold">
-                        {posts
-                          .filter((p) => p.bandId === MY_BAND_ID)
-                          .reduce((sum, p) => sum + (p.interested || 0), 0)}
-                      </span>
+                {isCustomer && (
+                  <div className="mb-4">
+                    <label className="text-gray-500 dark:text-white/60 text-xs uppercase tracking-widest mb-2 block">Following</label>
+                    <button
+                      onClick={() => setFollowingFilter((v) => !v)}
+                      className={`w-full text-xs tracking-widest uppercase py-2 px-3 rounded-lg border transition-all ${
+                        followingFilter
+                          ? 'bg-purple-600/60 border-purple-400/40 text-white'
+                          : 'bg-white/80 dark:bg-white/10 border-gray-200 dark:border-white/20 text-gray-700 dark:text-white/70 hover:border-purple-400/40'
+                      }`}
+                    >
+                      {followingFilter ? '✓ Bands I Follow' : 'Bands I Follow'}
+                    </button>
+                  </div>
+                )}
+
+                {isProvider && (
+                  <div className="mt-6 pt-6 border-t border-black/[0.06] dark:border-white/10">
+                    <p className="text-gray-400 dark:text-white/40 text-xs uppercase tracking-widest mb-3">Your Stats</p>
+                    <div className="space-y-2">
+                      <div className="flex justify-between text-sm">
+                        <span className="text-gray-500 dark:text-white/60">Shows Posted</span>
+                        <span className="text-gray-900 dark:text-white font-bold">
+                          {posts.filter((p) => p.bandId === MY_BAND_ID).length}
+                        </span>
+                      </div>
+                      <div className="flex justify-between text-sm">
+                        <span className="text-gray-500 dark:text-white/60">Total Interested</span>
+                        <span className="text-gray-900 dark:text-white font-bold">
+                          {posts
+                            .filter((p) => p.bandId === MY_BAND_ID)
+                            .reduce((sum, p) => sum + (p.interested || 0), 0)}
+                        </span>
+                      </div>
                     </div>
                   </div>
-                </div>
+                )}
               </div>
             </aside>
 
@@ -618,7 +697,9 @@ export default function Feed() {
                       </button>
                     </div>
                   ) : (
-                    <p className="text-gray-400 dark:text-white/40 text-sm mt-1">Announce your upcoming shows</p>
+                    <p className="text-gray-400 dark:text-white/40 text-sm mt-1">
+                      {isProvider ? 'Announce your upcoming shows' : 'Browse upcoming concerts'}
+                    </p>
                   )}
                 </div>
                 <div className="flex items-center gap-4 flex-shrink-0">
@@ -633,7 +714,7 @@ export default function Feed() {
                       {saved ? 'Saved' : 'Posted'}
                     </span>
                   )}
-                  {isLoggedIn && !isFormOpen && (
+                  {isProvider && !isFormOpen && (
                     <button
                       onClick={() => setShowForm(true)}
                       disabled={submitting}
@@ -671,7 +752,7 @@ export default function Feed() {
               )}
 
               {/* Mobile-only pill filters */}
-              <div className="flex items-center gap-3 mb-6 lg:hidden">
+              <div className="flex items-center gap-3 mb-6 lg:hidden flex-wrap">
                 <CustomSelect
                   value={genreFilter}
                   onChange={(e) => setGenreFilter(e.target.value)}
@@ -688,6 +769,18 @@ export default function Feed() {
                   ]}
                   className="bg-white/80 dark:bg-white/10 border border-gray-200 dark:border-white/20 text-gray-900 dark:text-white text-sm px-4 py-2 rounded-full focus:outline-none focus:border-purple-400 dark:focus:border-purple-400/40"
                 />
+                {isCustomer && (
+                  <button
+                    onClick={() => setFollowingFilter((v) => !v)}
+                    className={`text-sm px-4 py-2 rounded-full border transition-all ${
+                      followingFilter
+                        ? 'bg-purple-600/60 border-purple-400/40 text-white'
+                        : 'bg-white/80 dark:bg-white/10 border-gray-200 dark:border-white/20 text-gray-700 dark:text-white/70'
+                    }`}
+                  >
+                    {followingFilter ? '✓ Following' : 'Following'}
+                  </button>
+                )}
               </div>
 
               {/* Feed list */}
@@ -720,9 +813,12 @@ export default function Feed() {
                       key={post.id}
                       post={post}
                       isOwn={post.bandId === MY_BAND_ID}
-                      onEdit={post.bandId === MY_BAND_ID && post.showStatus !== 'CANCELLED' ? handleEdit : null}
-                      onDelete={post.bandId === MY_BAND_ID ? handleDelete : null}
-                      onCancel={post.bandId === MY_BAND_ID && post.showStatus !== 'CANCELLED' ? handleCancel : null}
+                      isCustomer={isCustomer}
+                      isSaved={savedShowIds.has(post.id)}
+                      onSave={handleSaveShow}
+                      onEdit={isProvider && post.bandId === MY_BAND_ID && post.showStatus !== 'CANCELLED' ? handleEdit : null}
+                      onDelete={isProvider && post.bandId === MY_BAND_ID ? handleDelete : null}
+                      onCancel={isProvider && post.bandId === MY_BAND_ID && post.showStatus !== 'CANCELLED' ? handleCancel : null}
                     />
                   ))}
                 </div>

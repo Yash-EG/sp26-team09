@@ -1,9 +1,10 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { getBandByEmail } from '../api'
+import { getBandByEmail, getCustomerByEmail } from '../api'
 
 export default function LoginCard({ onClose, onSwitch }) {
   const navigate = useNavigate()
+  const [role, setRole] = useState('Band / Artist')
   const [formData, setFormData] = useState({ email: '', password: '' })
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
@@ -13,16 +14,27 @@ export default function LoginCard({ onClose, onSwitch }) {
     setLoading(true)
     setError(null)
     try {
-      const band = await getBandByEmail(formData.email)
-      if (band.passwordHash !== formData.password) {
-        setError('Incorrect password.')
-        return
+      if (role === 'Band / Artist') {
+        const band = await getBandByEmail(formData.email)
+        if (band.passwordHash !== formData.password) {
+          setError('Incorrect password.')
+          return
+        }
+        localStorage.setItem('bandId', band.userId)
+        localStorage.setItem('bandName', band.name)
+        navigate('/dashboard')
+      } else {
+        const customer = await getCustomerByEmail(formData.email)
+        if (customer.passwordHash !== formData.password) {
+          setError('Incorrect password.')
+          return
+        }
+        localStorage.setItem('customerId', customer.userId)
+        localStorage.setItem('customerName', customer.name)
+        navigate('/feed')
       }
-      localStorage.setItem('bandId', band.userId)
-      localStorage.setItem('bandName', band.name)
-      navigate('/dashboard')
     } catch {
-      setError('No band account found with that email.')
+      setError(`No ${role === 'Band / Artist' ? 'band' : 'customer'} account found with that email.`)
     } finally {
       setLoading(false)
     }
@@ -42,6 +54,23 @@ export default function LoginCard({ onClose, onSwitch }) {
 
         <h1 className="text-gray-900 dark:text-white font-bold text-3xl tracking-widest uppercase mb-2 text-center">Log In</h1>
         <p className="text-gray-500 dark:text-white/70 text-sm text-center mb-6">Welcome back to the scene</p>
+
+        <div className="flex gap-3 mb-6">
+          {['Band / Artist', 'Customer'].map((r) => (
+            <button
+              key={r}
+              type="button"
+              onClick={() => { setRole(r); setError(null) }}
+              className={`flex-1 py-2.5 rounded-full text-xs tracking-widest uppercase border transition-all ${
+                role === r
+                  ? 'bg-purple-600/60 border-purple-400/40 text-white'
+                  : 'bg-white/5 border-white/20 text-white/60 hover:bg-white/10'
+              }`}
+            >
+              {r}
+            </button>
+          ))}
+        </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>

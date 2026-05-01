@@ -5,12 +5,19 @@ import { useTheme } from '../ThemeContext'
 
 const NAV = 'bg-[#ede8e2] dark:bg-[#111111]'
 
-const authLinks = [
+const providerLinks = [
   { name: 'Dashboard', path: '/dashboard' },
   { name: 'Feed',      path: '/feed' },
   { name: 'Posts',     path: '/posts' },
   { name: 'Stats',     path: '/stats' },
   { name: 'Profile',   path: '/profile' },
+]
+
+const customerLinks = [
+  { name: 'Feed',     path: '/feed' },
+  { name: 'Updates',  path: '/posts' },
+  { name: 'My Shows', path: '/bookings' },
+  { name: 'Profile',  path: '/profile' },
 ]
 
 const guestLinks = [
@@ -22,13 +29,18 @@ export default function Navbar() {
   const { isDark, toggle } = useTheme()
   const [menuOpen, setMenuOpen] = useState(false)
   const [searchOpen, setSearchOpen] = useState(false)
-  const isLoggedIn = !!localStorage.getItem('bandId')
 
-  const links = isLoggedIn ? authLinks : guestLinks
+  const isProvider = !!localStorage.getItem('bandId')
+  const isCustomer = !!localStorage.getItem('customerId')
+  const isLoggedIn = isProvider || isCustomer
+
+  const links = isProvider ? providerLinks : isCustomer ? customerLinks : guestLinks
 
   function handleLogout() {
     localStorage.removeItem('bandId')
     localStorage.removeItem('bandName')
+    localStorage.removeItem('customerId')
+    localStorage.removeItem('customerName')
     navigate('/')
   }
 

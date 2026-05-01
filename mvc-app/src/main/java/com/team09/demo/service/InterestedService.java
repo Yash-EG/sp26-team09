@@ -60,5 +60,8 @@ public class InterestedService {
                 .collect(java.util.stream.Collectors.toList());
     }
 
+    public long getInterestedCount(Long showId) {
+        return interestedRepository.countInterestedByShowId(showId);
+    }
 
 }

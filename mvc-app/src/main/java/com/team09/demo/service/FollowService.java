@@ -63,5 +63,9 @@ import org.springframework.beans.factory.annotation.Autowired;
                     .map(Follow::getBand)
                     .collect(java.util.stream.Collectors.toList());
         }
-        
+
+        public long getFollowerCount(Long bandId) {
+            return followRepository.countFollowersByBandId(bandId);
+        }
+
     }

@@ -18,12 +18,15 @@ export default function Landing() {
     if (searchParams.get('signup') === '1') { setShowSignup(true); setSearchParams({}) }
   }, [searchParams])
 
-  const isLoggedIn = !!localStorage.getItem('bandId')
-  const bandName = localStorage.getItem('bandName')
+  const isProvider = !!localStorage.getItem('bandId')
+  const isCustomer = !!localStorage.getItem('customerId')
+  const isLoggedIn = isProvider || isCustomer
 
   function handleLogout() {
     localStorage.removeItem('bandId')
     localStorage.removeItem('bandName')
+    localStorage.removeItem('customerId')
+    localStorage.removeItem('customerName')
     window.location.reload()
   }
 
@@ -62,8 +65,11 @@ export default function Landing() {
     <div className='flex flex-col justify-center gap-2' style={{ animation: 'fadeSlideUp 0.6s 0.15s cubic-bezier(0.16,1,0.3,1) both' }}>
       {isLoggedIn ? (
         <>
-          <button onClick={() => navigate('/dashboard')} className='bg-purple-600/60 hover:bg-purple-600 backdrop-blur-sm border border-purple-400/40 text-white text-sm tracking-widest uppercase px-6 py-2.5 rounded-full transition-all whitespace-nowrap'>
-            Dashboard
+          <button
+            onClick={() => navigate(isProvider ? '/dashboard' : '/feed')}
+            className='bg-purple-600/60 hover:bg-purple-600 backdrop-blur-sm border border-purple-400/40 text-white text-sm tracking-widest uppercase px-6 py-2.5 rounded-full transition-all whitespace-nowrap'
+          >
+            {isProvider ? 'Dashboard' : 'Browse Shows'}
           </button>
           <button onClick={handleLogout} className='bg-black/5 dark:bg-white/10 hover:bg-black/10 dark:hover:bg-white/20 backdrop-blur-sm border border-black/10 dark:border-white/20 text-gray-700 dark:text-white text-sm tracking-widest uppercase px-6 py-2.5 rounded-full transition-all whitespace-nowrap'>
             Log Out

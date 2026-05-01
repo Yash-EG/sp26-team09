@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { createBand } from '../api'
+import { createBand, createCustomer } from '../api'
 import CustomSelect from './CustomSelect'
 
 export default function SignupCard({ onClose, onSwitch }) {
@@ -23,6 +23,10 @@ export default function SignupCard({ onClose, onSwitch }) {
       setError('Passwords do not match.')
       return
     }
+    if (!formData.role) {
+      setError('Please select a role.')
+      return
+    }
     setLoading(true)
     setError(null)
     try {
@@ -38,8 +42,19 @@ export default function SignupCard({ onClose, onSwitch }) {
         })
         localStorage.setItem('bandId', band.userId)
         localStorage.setItem('bandName', band.name)
+        navigate('/dashboard')
+      } else {
+        const customer = await createCustomer({
+          email: formData.email,
+          passwordHash: formData.password,
+          role: 'CUSTOMER',
+          status: 'ACTIVE',
+          name: formData.name,
+        })
+        localStorage.setItem('customerId', customer.userId)
+        localStorage.setItem('customerName', customer.name)
+        navigate('/feed')
       }
-      navigate('/dashboard')
     } catch (err) {
       setError(err.message)
     } finally {

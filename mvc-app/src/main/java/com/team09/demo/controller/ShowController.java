@@ -2,6 +2,7 @@ package com.team09.demo.controller;
 
 import com.team09.demo.entity.Show;
 import com.team09.demo.service.ShowService;
+import com.team09.demo.service.InterestedService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,6 +15,9 @@ public class ShowController {
 
     @Autowired
     private ShowService showService;
+
+    @Autowired
+    private InterestedService interestedService;
 
     // POST /shows — Create a new show (Band creates a service)
     @PostMapping
@@ -58,5 +62,11 @@ public class ShowController {
     public ResponseEntity<Void> deleteShow(@PathVariable Long id) {
         showService.deleteShow(id);
         return ResponseEntity.noContent().build();
+    }
+
+    // GET /shows/{id}/interested/count — Get number of customers interested in a show
+    @GetMapping("/{id}/interested/count")
+    public long getInterestedCount(@PathVariable Long id) {
+        return interestedService.getInterestedCount(id);
     }
 }
