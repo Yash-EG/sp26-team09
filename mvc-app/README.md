@@ -28,10 +28,10 @@ mvc-app/
 
 ## Prerequisites
 
-- Java 21 or compatible JDK
+- Java 25 or compatible JDK
 - Node.js and npm
 - PostgreSQL database access (or use the existing Neon connection)
-- Maps API key (required for the map feature on show listings)
+- Mapbox API key (required for the map feature on show listings)
 
 ## Database Configuration
 
@@ -187,3 +187,37 @@ http://localhost:8080
 - `204 No Content` — Resource deleted successfully
 - `400 Bad Request` — Request could not be completed
 - `404 Not Found` — Resource not found
+
+---
+
+## Use Case to MVC Mapping
+
+Each use case maps to a React page (View), a Spring REST controller (Controller), a service class (Model/Service), and a JPA repository (Model/Repository).
+
+### Customer Use Cases
+
+| Use Case | View (React Page) | Controller | Service | Repository |
+|----------|-------------------|------------|---------|------------|
+| US-CUST-001: Sign up / Log in | `LoginCard`, `SignupCard` | `CustomerController` | `CustomerService` | `CustomerRepository` |
+| US-CUST-002: Browse feed with genre filter | `Feed.jsx` | `ShowController` | `ShowService` | `ShowRepository` |
+| US-CUST-003: View show details with map | `ShowDetails.jsx` | `ShowController` | `ShowService` | `ShowRepository` |
+| US-CUST-004: Mark show as interested | `ShowDetails.jsx`, `Feed.jsx` | `CustomerController` | `InterestedService` | `InterestedRepository` |
+| US-CUST-005: Follow / unfollow a band | `BandPage.jsx`, `Profile.jsx` | `CustomerController` | `FollowService` | `FollowRepository` |
+| US-CUST-006: Browse posts / filter by following | `Posts.jsx` | `PostController` | `PostService` | `PostRepository` |
+| US-CUST-007: Like / unlike a post | `Posts.jsx` | `PostController` | `PostService` | `PostRepository` |
+| US-CUST-008: Comment on a post | `Posts.jsx` | `PostController` | `PostCommentService` | `PostCommentRepository` |
+| US-CUST-009: View public band profile | `BandPage.jsx` | `BandController`, `ShowController` | `BandService`, `ShowService` | `BandRepository`, `ShowRepository` |
+| US-CUST-010: Genre-based recommendations | `Profile.jsx` | `ShowController`, `CustomerController` | `ShowService`, `CustomerService` | `ShowRepository`, `CustomerRepository` |
+| US-CUST-011: Manage customer profile | `Profile.jsx` | `CustomerController` | `CustomerService` | `CustomerRepository` |
+
+### Band (Provider) Use Cases
+
+| Use Case | View (React Page) | Controller | Service | Repository |
+|----------|-------------------|------------|---------|------------|
+| US-PROV-001: Sign up / Log in | `LoginCard`, `SignupCard` | `BandController` | `BandService` | `BandRepository` |
+| US-PROV-002: Create a show listing | `Bookings.jsx` | `ShowController` | `ShowService` | `ShowRepository` |
+| US-PROV-003: Update / delete show listings | `Bookings.jsx` | `ShowController` | `ShowService` | `ShowRepository` |
+| US-PROV-004: Manage band profile | `Profile.jsx` | `BandController` | `BandService` | `BandRepository` |
+| US-PROV-005: Create / delete posts | `Posts.jsx` | `PostController` | `PostService` | `PostRepository` |
+| US-PROV-006: View likes and comments on posts | `Posts.jsx` | `PostController` | `PostService`, `PostCommentService` | `PostRepository`, `PostCommentRepository` |
+| US-PROV-007: View follower and save statistics | `Stats.jsx` | `BandController`, `ShowController` | `FollowService`, `InterestedService` | `FollowRepository`, `InterestedRepository` |

@@ -2,7 +2,7 @@
 
 CSC 340 Team 09 project for finding and posting small, local live music shows.
 
-Scene Scout is a full-stack web application that helps local bands advertise shows and helps concert fans discover events nearby. The project uses React, Tailwind CSS, and Vite for the frontend prototypes, and Spring Boot with Spring Data JPA for the backend API.
+Scene Scout is a full-stack web application that helps local bands advertise shows and helps concert fans discover events nearby. The final implementation is a unified MVC application using Spring Boot for the backend and React for the frontend, serving both band and customer roles from a single codebase.
 
 ## Team Members
 
@@ -20,14 +20,19 @@ Scene Scout is a full-stack web application that helps local bands advertise sho
 
 ```text
 sp26-team09/
-|-- backend-api/                 # Spring Boot REST API
-|-- high-fidelity-prototype/
-|   |-- customer/                # React customer-facing app
-|   `-- provider/                # React band/provider-facing app
-|-- docs/                        # SRS, diagrams, and project documentation
+|-- mvc-app/                     # Final MVC application (Spring Boot + React)
+|   |-- frontend/                # React + Vite frontend (both customer and band views)
+|   `-- src/                     # Spring Boot backend
+|-- backend-api/                 # Earlier standalone backend API (milestone 5)
+|-- high-fidelity-prototype/     # Earlier React prototypes (milestone 3)
+|   |-- customer/                # Customer-facing prototype
+|   `-- provider/                # Band/provider-facing prototype
+|-- docs/                        # SRS, class diagram, and project documentation
 |-- README.md                    # Whole-project documentation
 `-- Reqs Testing Plan.md         # Requirements testing plan
 ```
+
+The final deliverable is the **mvc-app**. See [mvc-app/README.md](mvc-app/README.md) for setup instructions and use-case mappings.
 
 ## Prerequisites
 
@@ -37,84 +42,65 @@ Before running the project, make sure you have the following installed:
 - Node.js and npm
 - Git
 - PostgreSQL database access
+- Mapbox API key (required for the map feature on show details)
 
-## Database Configuration
+## Running the App
 
-The backend uses PostgreSQL through the connection settings in `backend-api/src/main/resources/application.properties`.
+See [mvc-app/README.md](mvc-app/README.md) for full setup instructions.
 
-If you are running the project with a different database, update `spring.datasource.url` in that file before starting the backend. The project currently uses `spring.jpa.hibernate.ddl-auto=update`, so Spring Boot will update the database schema based on the JPA entity classes when the application starts.
+### Quick Start
 
-## Installation
-
-### 1. Clone the Repository
-
+**1. Clone the repository**
 ```bash
 git clone git@github.com:Yash-EG/sp26-team09.git
-cd sp26-team09
+cd sp26-team09/mvc-app
 ```
 
-### 2. Run the Backend API
+**2. Configure the database** — create `src/main/resources/application.properties`:
+```properties
+spring.datasource.url=jdbc:postgresql://<host>/<db>?user=<user>&password=<password>&sslmode=require
+spring.jpa.hibernate.ddl-auto=update
+```
 
+**3. Start the backend** — open `mvc-app` in IntelliJ or VS Code and run `Application.java`, or:
 ```bash
-cd backend-api
-./mvnw clean install
-./mvnw spring-boot:run
+mvn spring-boot:run
 ```
 
-The backend API will run at:
-
-```text
-http://localhost:8080
-```
-
-### 3. Run the Customer Frontend
-
-Open a second terminal:
-
+**4. Start the frontend** — open a second terminal:
 ```bash
-cd high-fidelity-prototype/customer
+cd frontend
 npm install
 npm run dev
 ```
 
-The customer app will run at the Vite URL shown in the terminal, usually:
+The app runs at `http://localhost:5173`. Both servers must be running at the same time.
 
-```text
-http://localhost:5173
-```
-
-### 4. Run the Provider Frontend
-
-Open a third terminal:
-
-```bash
-cd high-fidelity-prototype/provider
-npm install
-npm run dev
-```
-
-If the customer app is already using port `5173`, Vite will choose the next open port, usually:
-
-```text
-http://localhost:5174
-```
-
-## App Functions
+## App Features
 
 ### Customer / Audience
 
-1. Create and modify a customer profile with location, bio, profile picture, and preferred genres.
-2. Browse local shows in a feed.
-3. View show details including band, location, ticket price, date, time, genre, and ticket link.
-4. Mark shows as interested.
-5. Follow bands for future announcements.
+1. Sign up and log in as a customer.
+2. Browse all shows in the feed with genre filtering.
+3. View show details including venue, date, price, lineup, ticket link, and an embedded map.
+4. Mark shows as interested and track them.
+5. Follow and unfollow bands.
+6. View public band profile pages with upcoming shows.
+7. Browse band posts and filter by followed bands.
+8. Like and unlike posts with real-time counts.
+9. Comment on posts (280 character limit).
+10. Get genre-based show recommendations from their profile page.
+11. Manage profile including name, bio, location, and preferred genres.
 
 ### Provider / Band
 
-1. Create and modify a band profile with bio, contact information, genres, rate, equipment, and social links.
-2. Create show listings with venue, date, time, lineup, ticket price, and ticket URL.
-3. Update or delete existing show listings.
-4. View provider-facing pages for profile, bookings, feed, availability, and dashboard workflows.
+1. Sign up and log in as a band.
+2. Manage band profile with bio, contact info, social links, genre, and more.
+3. Create, update, and delete show listings.
+4. View upcoming and past shows on the Bookings page.
+5. Create and delete posts with images and captions.
+6. See like counts and comments on their posts.
+7. View statistics including total follower count and per-show save counts.
 
 ## API Endpoints
 
