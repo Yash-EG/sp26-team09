@@ -29,11 +29,12 @@ public class Post {
 
     private LocalDateTime createdAt;
 
-    @Column(columnDefinition = "integer default 0", nullable = false)
-    private int likeCount = 0;
+    @Column(columnDefinition = "integer default 0")
+    private Integer likeCount = 0;
 
     @PrePersist
     protected void onCreate() {
         createdAt = LocalDateTime.now();
+        if (likeCount == null) likeCount = 0;
     }
 }
