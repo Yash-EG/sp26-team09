@@ -647,4 +647,4 @@ curl -X POST http://localhost:8080/api/genres \
 - Backend API documentation: [backend-api/README.md](backend-api/README.md)
 - Project docs: [docs/README.md](docs/README.md)
 - Software requirements specification: [docs/SceneScoutSRS.md](docs/SceneScoutSRS.md)
-- UML class diagram: [docs/sceneScoutClassDiagram.png](docs/sceneScoutClassDiagram.png)
+- UML class diagram: [docs/sceneScoutClassDiagramUpdated.png](docs/sceneScoutClassDiagramUpdated.png)
